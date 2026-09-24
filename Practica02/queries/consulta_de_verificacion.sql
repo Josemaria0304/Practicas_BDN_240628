@@ -46,3 +46,10 @@ GROUP BY
     b.operation_date 
 ORDER BY b.operation_date ASC  
 LIMIT 0, 1000;
+
+SELECT User, Host FROM mysql.user WHERE Host = '%' AND account_locked = 'Y';
+
+SELECT User, Host FROM mysql.user WHERE Host = '%' AND account_locked = 'N';
+
+SELECT  TO_USER AS usuario,  TO_HOST AS host, FROM_USER AS rol, FROM_HOST AS rol_host
+FROM mysql.role_edges ORDER BY TO_USER, FROM_USER;
