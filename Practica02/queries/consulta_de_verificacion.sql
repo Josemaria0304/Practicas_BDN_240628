@@ -53,3 +53,7 @@ SELECT User, Host FROM mysql.user WHERE Host = '%' AND account_locked = 'N';
 
 SELECT  TO_USER AS usuario,  TO_HOST AS host, FROM_USER AS rol, FROM_HOST AS rol_host
 FROM mysql.role_edges ORDER BY TO_USER, FROM_USER;
+
+SELECT * FROM vw_trazabilidad_productos ORDER BY operation_date desc limit 10;
+
+SELECT * FROM vw_trazabilidad_usuarios ORDER BY operation_date asc;
