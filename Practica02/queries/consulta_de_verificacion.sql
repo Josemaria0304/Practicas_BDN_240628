@@ -57,3 +57,7 @@ FROM mysql.role_edges ORDER BY TO_USER, FROM_USER;
 SELECT * FROM vw_trazabilidad_productos ORDER BY operation_date desc limit 10;
 
 SELECT * FROM vw_trazabilidad_usuarios ORDER BY operation_date asc;
+
+SELECT COUNT(*), vp.inserted_by
+FROM vw_trazabilidad_productos vp
+GROUP BY vp.inserted_by;
