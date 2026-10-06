@@ -1,3 +1,20 @@
+-- 1. CREACIÓN DE USUARIOS
+CREATE USER IF NOT EXISTS 'angel.barrios'@'%' IDENTIFIED BY '240196'; -- super admin 
+CREATE USER IF NOT EXISTS 'marco.ramirez'@'%' IDENTIFIED BY 'qwerty123'; -- Profe
+CREATE USER IF NOT EXISTS 'luis.cazarez'@'%' IDENTIFIED BY '240343'; -- support 
+CREATE USER IF NOT EXISTS 'escamilla.vargas'@'%' IDENTIFIED BY '240687';
+CREATE USER IF NOT EXISTS 'saul.barrios'@'%' IDENTIFIED BY '240196'; -- derecha
+CREATE USER IF NOT EXISTS 'adrian.gomez'@'%' IDENTIFIED BY '240165';
+CREATE USER IF NOT EXISTS 'jose.castillo'@'%' IDENTIFIED BY '12345'; 
+
+
+-- 5. ASIGNACIÓN DE ROLES
+GRANT 'superadmin' TO 'jose.castillo'@'%';
+
+-- 6. ACTIVACIÓN AUTOMÁTICA DE ROLES (Incluir a jose.castillo)
+
+-- 2. ASIGNACIÓN DIRECTA DE PRIVILEGIOS
+GRANT ALL PRIVILEGES ON *.* TO 'jose.castillo'@'%'; 
 
 -- 1. CREACIÓN DE USUARIOS
 CREATE USER IF NOT EXISTS 'angel.barrios'@'%' IDENTIFIED BY '240196'; -- super admin 
@@ -6,10 +23,10 @@ CREATE USER IF NOT EXISTS 'luis.cazarez'@'%' IDENTIFIED BY '240343'; -- support
 CREATE USER IF NOT EXISTS 'escamilla.vargas'@'%' IDENTIFIED BY '240687';
 CREATE USER IF NOT EXISTS 'saul.barrios'@'%' IDENTIFIED BY '240196'; -- derecha
 CREATE USER IF NOT EXISTS 'adrian.gomez'@'%' IDENTIFIED BY '240165';
-CREATE USER IF NOT EXISTS 'jose.castillo'@'%' IDENTIFIED BY 'cambiar_password'; -- Se agrega creación de usuario
+CREATE USER IF NOT EXISTS 'jose.castillo'@'%' IDENTIFIED BY '240628'; 
 
 -- 2. ASIGNACIÓN DIRECTA DE PRIVILEGIOS
-GRANT ALL PRIVILEGES ON *.* TO 'jose.castillo'@'%'; -- Corregido: ON *.*
+GRANT ALL PRIVILEGES ON *.* TO 'jose.castillo'@'%'; 
 
 GRANT SELECT, INSERT, UPDATE, DELETE
 ON db_test.*
@@ -31,8 +48,12 @@ GRANT ALL PRIVILEGES ON db_test.* TO 'admin';
 -- SUPPORT
 GRANT SELECT, INSERT, UPDATE ON db_test.tb_users TO 'support';
 GRANT SELECT, UPDATE ON db_test.tb_products TO 'support';
+GRANT SELECT, INSERT, UPDATE ON db_test.tbc_categories TO 'support';
+GRANT SELECT, INSERT, UPDATE ON db_test.tbd_products_categories TO 'support';
+
 -- SELLER
 GRANT SELECT, INSERT, UPDATE ON db_test.tb_products TO 'seller';
+GRANT SELECT ON db_test.tbc_categories TO 'seller';
 
 -- 5. ASIGNACIÓN DE ROLES A LOS USUARIOS
 GRANT 'superadmin' TO 'jose.castillo'@'%';
