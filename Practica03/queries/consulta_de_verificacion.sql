@@ -61,3 +61,20 @@ SELECT * FROM vw_trazabilidad_usuarios ORDER BY operation_date asc;
 SELECT COUNT(*), vp.inserted_by
 FROM vw_trazabilidad_productos vp
 GROUP BY vp.inserted_by;
+
+
+UPDATE tb_products SET status=b'0'
+WHERE id=16
+
+/* Opcion 2: Implementar un procedimiento general para la desactivacion de productos*/
+CALL sp_soft_delete("tb_products",16);
+
+SHOW TRIGGERS FROM db_test;
+
+/* 3.Contabilizar cuantos productos por categoria*/
+
+SELECT *
+FROM vw_total_products_by_category
+ORDER BY category_id is null;
+
+SHOW PROCEDURE STATUS WHERE Db= 'db_test'
