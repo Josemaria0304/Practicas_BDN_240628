@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "erd",
+  "quality": "standard",
+  "specification": {
+    "path": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\candidate.json",
+    "sha256": "0be963baafa0660267a4a6f9c102b5e87e21e75e5876ae28f8c799a35c872256",
+    "bytes": 14779
+  },
+  "artifact": {
+    "path": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\db-test-erd.html",
+    "sha256": "78cc105497e789d618c7c1e356b74f8af46c250fcf6672dc672ddea26c7083a5",
+    "bytes": 894314
+  },
+  "gates": {
+    "validate": "fail",
+    "deliver": "not-run",
+    "check": "not-run",
+    "browser-check": "not-run"
+  },
+  "failedStage": "validate",
+  "diagnostics": [
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tb_users\" attribute 5 \"last_update\" needs 207px of text but only 206px is available — For this attribute row's text capacity, set entities[0].width to at least 261px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tb_users",
+        "attributeIndex": 5,
+        "attributeName": "last_update"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 261,
+        "availableTextWidth": 206,
+        "requiredTextWidth": 206.6,
+        "paddingWidth": 24,
+        "keyColumnWidth": 30,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[0].width to at least 261px, preserving the attribute name, type and key roles."
+      ]
+    },
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tb_carts\" attribute 3 \"creation_date\" needs 201px of text but only 186px is available — For this attribute row's text capacity, set entities[1].width to at least 275px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tb_carts",
+        "attributeIndex": 3,
+        "attributeName": "creation_date"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 275,
+        "availableTextWidth": 186,
+        "requiredTextWidth": 200.89999999999998,
+        "paddingWidth": 24,
+        "keyColumnWidth": 50,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[1].width to at least 275px, preserving the attribute name, type and key roles."
+      ]
+    },
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tb_carts\" attribute 4 \"last_update\" needs 213px of text but only 186px is available — For this attribute row's text capacity, set entities[1].width to at least 287px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tb_carts",
+        "attributeIndex": 4,
+        "attributeName": "last_update"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 287,
+        "availableTextWidth": 186,
+        "requiredTextWidth": 212.89999999999998,
+        "paddingWidth": 24,
+        "keyColumnWidth": 50,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[1].width to at least 287px, preserving the attribute name, type and key roles."
+      ]
+    },
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tb_products\" attribute 4 \"current_price\" needs 220px of text but only 206px is available — For this attribute row's text capacity, set entities[2].width to at least 274px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tb_products",
+        "attributeIndex": 4,
+        "attributeName": "current_price"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 274,
+        "availableTextWidth": 206,
+        "requiredTextWidth": 219.8,
+        "paddingWidth": 24,
+        "keyColumnWidth": 30,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[2].width to at least 274px, preserving the attribute name, type and key roles."
+      ]
+    },
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tb_products\" attribute 5 \"current_stock\" needs 214px of text but only 206px is available — For this attribute row's text capacity, set entities[2].width to at least 268px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tb_products",
+        "attributeIndex": 5,
+        "attributeName": "current_stock"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 268,
+        "availableTextWidth": 206,
+        "requiredTextWidth": 213.5,
+        "paddingWidth": 24,
+        "keyColumnWidth": 30,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[2].width to at least 268px, preserving the attribute name, type and key roles."
+      ]
+    },
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tb_products\" attribute 8 \"last_update\" needs 226px of text but only 206px is available — For this attribute row's text capacity, set entities[2].width to at least 280px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tb_products",
+        "attributeIndex": 8,
+        "attributeName": "last_update"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 280,
+        "availableTextWidth": 206,
+        "requiredTextWidth": 225.49999999999997,
+        "paddingWidth": 24,
+        "keyColumnWidth": 30,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[2].width to at least 280px, preserving the attribute name, type and key roles."
+      ]
+    },
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tbc_categories\" attribute 3 \"sup_id_category\" needs 227px of text but only 206px is available — For this attribute row's text capacity, set entities[3].width to at least 281px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tbc_categories",
+        "attributeIndex": 3,
+        "attributeName": "sup_id_category"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 281,
+        "availableTextWidth": 206,
+        "requiredTextWidth": 226.7,
+        "paddingWidth": 24,
+        "keyColumnWidth": 30,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[3].width to at least 281px, preserving the attribute name, type and key roles."
+      ]
+    },
+    {
+      "code": "erd/attribute-text-capacity",
+      "severity": "error",
+      "message": "Entity \"tbc_categories\" attribute 6 \"last_update\" needs 226px of text but only 206px is available — For this attribute row's text capacity, set entities[3].width to at least 280px, preserving the attribute name, type and key roles.",
+      "subject": {
+        "diagramType": "erd",
+        "entityId": "tbc_categories",
+        "attributeIndex": 6,
+        "attributeName": "last_update"
+      },
+      "evidence": {
+        "entityWidth": 260,
+        "requiredEntityWidth": 280,
+        "availableTextWidth": 206,
+        "requiredTextWidth": 225.49999999999997,
+        "paddingWidth": 24,
+        "keyColumnWidth": 30,
+        "nameFontSize": 11,
+        "typeFontSize": 10.5
+      },
+      "supportedFixes": [
+        "For this attribute row's text capacity, set entities[3].width to at least 280px, preserving the attribute name, type and key roles."
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 24,
+    "shown": 8,
+    "truncated": true,
+    "omittedByCode": {
+      "erd/attribute-text-capacity": 16
+    }
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\review-3\\db-test-erd.finalize.json",
+    "summaryReceipt": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\review-3\\db-test-erd.finalize-summary.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.1.0",
+    "availableVersion": "3.1.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-15T00:09:18.321Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 698,
+  "nextAction": {
+    "action": "edit-in-place",
+    "candidate": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\candidate.json",
+    "constraint": "Preserve unaffected semantics and geometry; apply each diagnostic's supportedFixes, or the fix its message names, and do not replace the whole candidate.",
+    "then": "finalize-once"
+  }
+}

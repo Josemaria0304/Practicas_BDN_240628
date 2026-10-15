@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "e277b44b-1efe-4324-9bcf-4176defa63bf",
+  "status": "current",
+  "command": "deliver",
+  "type": "erd",
+  "input": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\candidate.json",
+  "output": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\db-test-erd.html",
+  "specification": {
+    "sha256": "24fa529775f96321fa989bb49edb4681a95447c45e70921348a0f280d1799904",
+    "bytes": 14932
+  },
+  "artifact": {
+    "sha256": "9c0b6e8a85b8c5f0ac812f840c8282c7bed3593e5680169a7e9d60e1a3d9580a",
+    "bytes": 895975
+  }
+}

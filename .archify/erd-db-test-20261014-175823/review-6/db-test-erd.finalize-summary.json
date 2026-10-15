@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "erd",
+  "quality": "standard",
+  "specification": {
+    "path": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\candidate.json",
+    "sha256": "38d4ae2c3fdeebda09f92754fb0411844a7a3b9968bb19239a602d196488c4be",
+    "bytes": 14743
+  },
+  "artifact": {
+    "path": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\db-test-erd.html",
+    "sha256": "a456faaceb73aef8b4fd29b6acca06e3911e8b7ebaa451a3369c1d6c08fb521d",
+    "bytes": 895802
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\review-6\\db-test-erd.finalize.json",
+    "summaryReceipt": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\review-6\\db-test-erd.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\PC-28\\Documents\\Practicas_BDN_240628\\.archify\\erd-db-test-20261014-175823\\review-6\\db-test-erd.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.1.0",
+    "availableVersion": "3.1.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-15T00:09:18.321Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 4225,
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "routesOverSuggestedBends": 6,
+      "routesOverSuggestedStretch": 5
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [],
+      "detours": [
+        {
+          "relationship": {
+            "id": "order_user",
+            "from": "tbb_orders",
+            "to": "tb_users",
+            "label": "User_ID",
+            "collectionIndex": 1,
+            "artifactIndex": 2
+          },
+          "bends": 4,
+          "stretch": 1.42
+        },
+        {
+          "relationship": {
+            "id": "payment_order",
+            "from": "tbd_payments",
+            "to": "tbb_orders",
+            "label": "order_ID",
+            "collectionIndex": 5,
+            "artifactIndex": 6
+          },
+          "bends": 4,
+          "stretch": 1.885,
+          "directCorridorBlockers": [
+            {
+              "id": "tbd_order_details",
+              "label": "tbd_order_details",
+              "box": [
+                741,
+                290,
+                280,
+                196
+              ]
+            }
+          ]
+        },
+        {
+          "relationship": {
+            "id": "cart_item_product",
+            "from": "tbd_shopping_cart",
+            "to": "tb_products",
+            "label": "product_ID",
+            "collectionIndex": 8,
+            "artifactIndex": 9
+          },
+          "bends": 4,
+          "stretch": 4.405
+        },
+        {
+          "relationship": {
+            "id": "cart_item_user",
+            "from": "tbd_shopping_cart",
+            "to": "tb_users",
+            "label": "user_ID",
+            "collectionIndex": 9,
+            "artifactIndex": 10
+          },
+          "bends": 4,
+          "stretch": 1.189
+        },
+        {
+          "relationship": {
+            "id": "wishlist_product",
+            "from": "tbd_users_wishlist_proudcts",
+            "to": "tb_products",
+            "label": "product_ID · PK/FK",
+            "collectionIndex": 12,
+            "artifactIndex": 13
+          },
+          "bends": 4,
+          "stretch": 1.749
+        },
+        {
+          "relationship": {
+            "id": "wishlist_user",
+            "from": "tbd_users_wishlist_proudcts",
+            "to": "tb_users",
+            "label": "user_ID · PK/FK",
+            "collectionIndex": 13,
+            "artifactIndex": 14
+          },
+          "bends": 6,
+          "stretch": 1.92
+        }
+      ],
+      "truncated": false
+    },
+    "repair": "Advisory only: this mode places or routes these relationships itself. Report them; do not remove relationships or meaning to reduce crossings."
+  }
+}
