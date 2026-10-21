@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "4d795720-e6f0-4204-9e7a-02b6a32a567b",
+  "status": "current",
+  "command": "deliver",
+  "type": "explainer",
+  "input": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\.archify\\explainer-diccionario-datos-20261021-0905\\candidate.archify.md",
+  "output": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\Diccionario-de-datos.html",
+  "specification": {
+    "sha256": "7f139cfdcfa16435c9d6c25ccfea5524fe3f1562fb2eed8ae9031bd82ca02e77",
+    "bytes": 47657
+  },
+  "artifact": {
+    "sha256": "25d451f41186730943a151d74b669a5016d88ef1a32e8ff296062476a9ecafd5",
+    "bytes": 635587
+  },
+  "explainer": {
+    "preparedSha256": "c0621cbdae849ac856b8061d71c3b2e47e9a99397d2fff19d6bc7d0a8434f90c",
+    "dependencies": []
+  }
+}
