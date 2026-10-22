@@ -67,7 +67,8 @@ SET DEFAULT ROLE ALL TO
   'marco.ramirez'@'%', 
   'luis.cazarez'@'%', 
   'adrian.gomez'@'%', 
-  'saul.barrios'@'%'; -- Corregido: cambiada la coma por el punto y coma final
+  'saul.barrios'@'%';
+  ; -- Corregido: cambiada la coma por el punto y coma final
 
 -- 7. REFRESCAR PRIVILEGIOS
 FLUSH PRIVILEGES;

@@ -9,6 +9,11 @@ CREATE USER IF NOT EXISTS 'escamilla.vargas'@'%' IDENTIFIED BY '240687';
 CREATE USER IF NOT EXISTS 'saul.barrios'@'%' IDENTIFIED BY '240196'; -- derecha
 CREATE USER IF NOT EXISTS 'adrian.gomez'@'%' IDENTIFIED BY '240165';
 CREATE USER IF NOT EXISTS 'jose.castillo'@'%' IDENTIFIED BY '12345'; 
+CREATE USER IF NOT EXISTS 'jose.amaro'@'%' IDENTIFIED BY '240726'; 
+CREATE USER IF NOT EXISTS 'app_web'@'%' IDENTIFIED BY 'web123';
+CREATE USER IF NOT EXISTS 'app_movil'@'%' IDENTIFIED BY 'mobile890';
+
+
 
 
 -- =====================================================
@@ -68,7 +73,18 @@ ON db_test.tb_products TO 'seller';
 GRANT SELECT
 ON db_test.tbc_categories TO 'seller';
 
+GRANT INSERT ON db_test.tb_people TO 'user_not_registered';
 
+GRANT INSERT ON db_test.tb_users TO 'user_not_registered';
+
+
+--- GRANT SELECT, INSERT, UPDATE ON db_test.tb_carts TO 'buyer';
+
+---GRANT SELECT, INSERT, UPDATE ON db_test.tb_carts_items TO 'buyer';
+
+--- GRANT SELECT, INSERT ON db_test.tb_buyer_orders TO 'buyer';
+
+---GRANT SELECT, INSERT, UPDATE ON db_test.tbd_users_wishlist_proudcts TO 'buyer';
 -- =====================================================
 -- 7. ASIGNACIÓN DE ROLES A USUARIOS
 -- =====================================================
@@ -83,6 +99,10 @@ GRANT 'seller' TO 'adrian.gomez'@'%';
 
 GRANT 'seller' TO 'saul.barrios'@'%';
 
+GRANT 'user_not_registered' TO 'app_web'@'%'
+
+GRANT 'user_not_registered' TO 'app_movil'@'%'
+
 
 -- =====================================================
 -- 8. ACTIVACIÓN AUTOMÁTICA DE ROLES
@@ -93,7 +113,10 @@ SET DEFAULT ROLE ALL TO
     'marco.ramirez'@'%',
     'luis.cazarez'@'%',
     'adrian.gomez'@'%',
-    'saul.barrios'@'%';
+    'saul.barrios'@'%',
+    'app_web'@'%',
+    'app_movil'@'%',
+    ;
 
 
 -- =====================================================
