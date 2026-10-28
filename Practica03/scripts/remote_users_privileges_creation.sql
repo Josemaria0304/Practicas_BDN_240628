@@ -8,7 +8,9 @@ CREATE USER IF NOT EXISTS 'luis.cazarez'@'%' IDENTIFIED BY '240343'; -- support
 CREATE USER IF NOT EXISTS 'escamilla.vargas'@'%' IDENTIFIED BY '240687';
 CREATE USER IF NOT EXISTS 'saul.barrios'@'%' IDENTIFIED BY '240196'; -- derecha
 CREATE USER IF NOT EXISTS 'adrian.gomez'@'%' IDENTIFIED BY '240165';
--- CREATE USER IF NOT EXISTS 'jose.amaro'@'%' IDENTIFIED BY '240726'; 
+CREATE USER IF NOT EXISTS 'jose.amaro'@'%' IDENTIFIED BY '240726'; 
+
+CREATE USER IF NOT EXISTS 'fernando.'@'%' IDENTIFIED BY '240726';
 CREATE USER IF NOT EXISTS 'app.web'@'%' IDENTIFIED BY 'web123';
 CREATE USER IF NOT EXISTS 'app.movil'@'%' IDENTIFIED BY 'mobile890';
 
@@ -77,13 +79,14 @@ GRANT INSERT ON db_test.tb_people TO 'user_not_registered';
 GRANT INSERT ON db_test.tb_users TO 'user_not_registered';
 
 
---- GRANT SELECT, INSERT, UPDATE ON db_test.tb_carts TO 'buyer';
+GRANT SELECT, INSERT, UPDATE ON db_test.tb_carts TO 'buyer';
 
---- GRANT SELECT, INSERT, UPDATE ON db_test.tb_carts_items TO 'buyer';
+ GRANT SELECT, INSERT, UPDATE ON db_test.tbd_carts_items TO 'buyer';
 
---- GRANT SELECT, INSERT ON db_test.tb_buyer_orders TO 'buyer';
+ GRANT SELECT, INSERT ON db_test.tb_buyer_orders TO 'buyer';
 
---- GRANT SELECT, INSERT, UPDATE ON db_test.tbd_users_wishlist_proudcts TO 'buyer';
+
+GRANT SELECT, INSERT, UPDATE ON db_test.tbd_users_wishlist_proudcts TO 'buyer';
 -- =====================================================
 -- 7. ASIGNACIÓN DE ROLES A USUARIOS
 -- =====================================================
@@ -97,6 +100,7 @@ GRANT 'support' TO 'luis.cazarez'@'%';
 GRANT 'seller' TO 'adrian.gomez'@'%';
 
 GRANT 'seller' TO 'saul.barrios'@'%';
+
 
 GRANT 'user_not_registered' TO 'app.web'@'%';
 
