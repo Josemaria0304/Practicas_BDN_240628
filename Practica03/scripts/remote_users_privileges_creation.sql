@@ -25,7 +25,7 @@ CREATE ROLE IF NOT EXISTS 'admin';
 CREATE ROLE IF NOT EXISTS 'seller';
 CREATE ROLE IF NOT EXISTS 'buyer';
 CREATE ROLE IF NOT EXISTS 'support';
-CREATE ROLE IF NOT EXISTS 'common';
+CREATE ROLE IF NOT EXISTS 'common_user';
 CREATE ROLE IF NOT EXISTS 'user_not_registered';
 
 
@@ -61,6 +61,13 @@ GRANT SELECT, INSERT, UPDATE
 ON db_test.tbd_products_categories TO 'support';
 
 GRANT EXECUTE ON PROCEDURE db_test.sp_soft_delete_user TO 'support'@'%';
+
+GRANT
+    'user_not_registered',
+    'common_user',
+    'buyer'
+TO 'app.web'@'%';
+
 
 
 -- =====================================================
