@@ -62,6 +62,9 @@ ON db_test.tbd_products_categories TO 'support';
 
 GRANT EXECUTE ON PROCEDURE db_test.sp_soft_delete_user TO 'support'@'%';
 
+GRANT SELECT
+ON db_test.tb_products TO 'common_user';
+
 GRANT
     'user_not_registered',
     'common_user',
@@ -85,12 +88,15 @@ GRANT INSERT ON db_test.tb_people TO 'user_not_registered';
 GRANT INSERT ON db_test.tb_users TO 'user_not_registered';
 
 
-GRANT SELECT, INSERT, UPDATE ON db_test.tb_carts TO 'buyer';
+--- GRANT SELECT, INSERT, UPDATE ON db_test.tb_carts TO 'buyer';
 
- GRANT SELECT, INSERT, UPDATE ON db_test.tbd_carts_items TO 'buyer';
+--- GRANT SELECT, INSERT, UPDATE ON db_test.tbd_carts_items TO 'buyer';
 
- GRANT SELECT, INSERT ON db_test.tb_buyer_orders TO 'buyer';
+--- GRANT SELECT, INSERT ON db_test.tb_buyer_orders TO 'buyer';
 
+GRANT SELECT
+ON db_test.tb_products
+TO 'common_user'@'%';
 
 GRANT SELECT, INSERT, UPDATE ON db_test.tbd_users_wishlist_proudcts TO 'buyer';
 -- =====================================================
@@ -125,6 +131,7 @@ SET DEFAULT ROLE ALL TO
     'saul.barrios'@'%',
     'app.web'@'%',
     'app.movil'@'%';
+
 
 
 -- =====================================================
