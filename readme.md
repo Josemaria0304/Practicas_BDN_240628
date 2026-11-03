@@ -10,4 +10,4 @@ Periiodo: Septiembre - Diciembre 2026
 |1.| Practica 02 |Conexion Remota en Mysql |42 |🟢 Concluida|
 |2.| Conexiones Remotas para Bases de Datos SQL |Crear y administrar usaurios y privilegios para conexiones desde internet o redes locales |60 |🟢 Concluida|
 |3.| Conexiones Remotas para Bases de Datos SQL|SN |🟢 Concluida|
-|4.| Conexiones Remotas para Bases de Datos SQL|SN |🟢 Pendiente|
+|4.| Conexiones Remotas para Bases de Datos SQL|SN |🟡 Pendiente|
