@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "explainer",
+  "quality": "showcase",
+  "startedAt": "2026-10-21T15:07:00.564Z",
+  "specification": {
+    "path": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\.archify\\explainer-diccionario-datos-20261021-0905\\candidate.archify.md",
+    "sha256": "7f139cfdcfa16435c9d6c25ccfea5524fe3f1562fb2eed8ae9031bd82ca02e77",
+    "bytes": 47657
+  },
+  "artifact": {
+    "path": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\Diccionario-de-datos.html",
+    "sha256": "25d451f41186730943a151d74b669a5016d88ef1a32e8ff296062476a9ecafd5",
+    "bytes": 635587
+  },
+  "stages": {
+    "browser-check": {
+      "status": "not-run",
+      "execution": "not-requested"
+    },
+    "validate": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": null,
+      "execution": "embedded-in-deliver",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\casti\\.agents\\skills\\archify\\bin\\archify.mjs",
+        "deliver",
+        "explainer",
+        "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\.archify\\explainer-diccionario-datos-20261021-0905\\candidate.archify.md",
+        "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\Diccionario-de-datos.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": true,
+        "command": "validate",
+        "specification": {
+          "sha256": "7f139cfdcfa16435c9d6c25ccfea5524fe3f1562fb2eed8ae9031bd82ca02e77",
+          "bytes": 47657
+        },
+        "validation": {
+          "checksPassed": 4,
+          "checkCount": 4,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    "deliver": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 1024,
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\casti\\.agents\\skills\\archify\\bin\\archify.mjs",
+        "deliver",
+        "explainer",
+        "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\.archify\\explainer-diccionario-datos-20261021-0905\\candidate.archify.md",
+        "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\Diccionario-de-datos.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "receiptId": "4d795720-e6f0-4204-9e7a-02b6a32a567b",
+        "ok": true,
+        "command": "deliver",
+        "type": "explainer",
+        "input": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\.archify\\explainer-diccionario-datos-20261021-0905\\candidate.archify.md",
+        "output": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\Diccionario-de-datos.html",
+        "explainer": {
+          "preparedSha256": "c0621cbdae849ac856b8061d71c3b2e47e9a99397d2fff19d6bc7d0a8434f90c",
+          "dependencies": []
+        },
+        "specification": {
+          "sha256": "7f139cfdcfa16435c9d6c25ccfea5524fe3f1562fb2eed8ae9031bd82ca02e77",
+          "bytes": 47657
+        },
+        "artifact": {
+          "sha256": "25d451f41186730943a151d74b669a5016d88ef1a32e8ff296062476a9ecafd5",
+          "bytes": 635587
+        },
+        "validation": {
+          "checksPassed": 4,
+          "checkCount": 4,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "update": {
+          "status": "unavailable",
+          "installedVersion": null,
+          "availableVersion": null,
+          "releaseNotes": null,
+          "checkedAt": null,
+          "source": null,
+          "noticeRequired": false,
+          "noticeText": null,
+          "reason": "disabled"
+        }
+      }
+    },
+    "check": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 396,
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\casti\\.agents\\skills\\archify\\bin\\archify.mjs",
+        "check",
+        "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\Diccionario-de-datos.html",
+        "--require-provenance"
+      ],
+      "receipt": {
+        "ok": true,
+        "file": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\Diccionario-de-datos.html",
+        "family": "explainer",
+        "artifact": {
+          "sha256": "25d451f41186730943a151d74b669a5016d88ef1a32e8ff296062476a9ecafd5",
+          "bytes": 635587
+        },
+        "checks": [
+          {
+            "name": "explainer_structure",
+            "ok": true,
+            "details": [
+              "217 unique DOM IDs"
+            ]
+          },
+          {
+            "name": "explainer_payload_identity",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "explainer_dependencies",
+            "ok": true,
+            "details": [
+              "0 frozen dependencies"
+            ]
+          },
+          {
+            "name": "explainer_native_diagrams",
+            "ok": true,
+            "details": []
+          }
+        ],
+        "composition": {
+          "schemaVersion": 1,
+          "profile": "showcase",
+          "status": "pass",
+          "summary": {
+            "errors": 0,
+            "warnings": 0
+          },
+          "issues": [],
+          "nativeDiagrams": []
+        },
+        "diagnostics": [],
+        "provenance": "current",
+        "deliveryReceiptId": "4d795720-e6f0-4204-9e7a-02b6a32a567b"
+      }
+    }
+  },
+  "browserCheck": {
+    "requested": false,
+    "ran": false
+  },
+  "diagnostics": [],
+  "evidence": {
+    "receipt": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\diccionario-de-datos.finalize.json",
+    "summaryReceipt": "C:\\Users\\casti\\Documents\\7 A\\Practicas_BDN_240628\\Practica03\\diccionario-de-datos.finalize-summary.json"
+  },
+  "visualReview": "not-requested",
+  "finishedAt": "2026-10-21T15:07:02.712Z",
+  "durationMs": 2147,
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-21T14:57:52.785Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  }
+}
