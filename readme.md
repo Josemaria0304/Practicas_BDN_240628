@@ -8,6 +8,6 @@ Periiodo: Septiembre - Diciembre 2026
 |ID |Numero de Practicas |Nombre de la Practica |Ponteciador |Estatus|
 |---|---|---|---|---|
 |1.| Practica 02 |Conexion Remota en Mysql |42 |🟢 Concluida|
-|2.| Conexiones Remotas para Bases de Datos SQL |Crear y administrar usaurios y privilegios para conexiones desde internet o redes locales |60 |🟢 Concluida|
-|3.| Conexiones Remotas para Bases de Datos SQL|SN |🟢 Concluida|
+|2.| Practica 03 | Conexiones Remotas para Bases de Datos SQL |Crear y administrar usaurios y privilegios para conexiones desde internet o redes locales |60 |🟢 Concluida|
+|3.| Practica 04 |Conexiones Remotas para Bases de Datos SQL|SN |🟢 Concluida|
 |4.| Conexiones Remotas para Bases de Datos SQL|SN |🟡 Pendiente|
