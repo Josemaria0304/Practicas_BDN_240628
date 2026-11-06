@@ -1,0 +1,3096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagrama Entidad-Relación Minimalista &mdash; db_test</title>
+<style>
+/* CSS RESET & MINIMALIST THEME */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-hover: #f8fafc;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  
+  --accent-pk: #d97706;
+  --accent-pk-bg: #fffbeb;
+  --accent-pk-border: #fef3c7;
+  
+  --accent-fk: #2563eb;
+  --accent-fk-bg: #eff6ff;
+  --accent-fk-border: #dbeafe;
+
+  --accent-uq: #7c3aed;
+  --accent-uq-bg: #f5f3ff;
+  
+  --badge-insert: #059669;
+  --badge-insert-bg: #ecfdf5;
+  --badge-update: #d97706;
+  --badge-update-bg: #fffbeb;
+  --badge-delete: #dc2626;
+  --badge-delete-bg: #fef2f2;
+  
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP NAVBAR */
+.topbar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  height: 56px;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.brand-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--accent-fk);
+}
+
+.brand-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.brand-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 0.35rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--border);
+}
+
+/* NAVIGATION TABS */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 100%;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.85rem;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.nav-tab:hover {
+  color: var(--text-main);
+  background: var(--bg-subtle);
+}
+
+.nav-tab.active {
+  color: var(--text-main);
+  font-weight: 600;
+  border-bottom-color: var(--text-main);
+  background: transparent;
+}
+
+.nav-tab .badge {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.nav-tab.active .badge {
+  background: var(--text-main);
+  color: #fff;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chip-stat {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chip-stat strong {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* MAIN VIEW CONTAINER */
+.app-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-pane {
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.tab-pane.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* TAB 1: RESUMEN GENERAL */
+.resumen-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  width: 100%;
+}
+
+.section-header {
+  margin-bottom: 1.5rem;
+}
+
+.section-header h1 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.section-header p {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border-strong);
+}
+
+.kpi-label {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0.35rem 0 0.15rem;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-sub {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+}
+
+.panel-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prefix-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.prefix-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.prefix-tag {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.prefix-tag.prefix-tb_ { color: #475569; }
+.prefix-tag.prefix-tbb_ { color: #0d9488; }
+.prefix-tag.prefix-tbc_ { color: #7c3aed; }
+.prefix-tag.prefix-tbd_ { color: #0284c7; }
+
+.prefix-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.prefix-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.prefix-metrics {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.top-table-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.table-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+}
+
+.bar-table-name {
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.bar-count {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--bg-subtle);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--text-main);
+  border-radius: 9999px;
+}
+
+/* TAB 2: ER DIAGRAM (INTERACTIVE CANVAS) */
+.diagram-pane {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f8fafc;
+  user-select: none;
+}
+
+.diagram-toolbar {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  right: 0.85rem;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  pointer-events: auto;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem 0.35rem 1.8rem;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  outline: none;
+  width: 180px;
+  transition: width 0.2s ease, border-color 0.2s ease;
+}
+
+.search-input:focus {
+  width: 240px;
+  border-color: var(--text-main);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.5rem;
+  width: 13px;
+  height: 13px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  max-height: 240px;
+  overflow-y: auto;
+  display: none;
+  z-index: 100;
+}
+
+.search-dropdown.open {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  font-family: ui-monospace, monospace;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-subtle);
+  color: var(--accent-fk);
+}
+
+.tool-btn {
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.tool-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-strong);
+}
+
+.tool-btn.active {
+  background: var(--text-main);
+  color: #fff;
+  border-color: var(--text-main);
+}
+
+.filter-pill {
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.filter-pill:hover {
+  color: var(--text-main);
+  background: var(--bg-subtle);
+}
+
+.filter-pill.active {
+  background: var(--text-main);
+  color: #fff;
+  border-color: var(--text-main);
+}
+
+/* CANVAS SVG & WORLD */
+.canvas-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.canvas-viewport.panning {
+  cursor: grabbing;
+}
+
+.canvas-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  width: 2600px;
+  height: 2000px;
+}
+
+/* SVG CONNECTOR LINES */
+.canvas-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2600px;
+  height: 2000px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.fk-path {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.fk-path:hover {
+  stroke: var(--accent-fk);
+  stroke-width: 2.5;
+}
+
+.fk-path.implied {
+  stroke-dasharray: 4 4;
+  stroke: #94a3b8;
+  opacity: 0.5;
+}
+
+.fk-path.highlighted {
+  stroke: var(--accent-fk);
+  stroke-width: 2.5;
+  opacity: 1 !important;
+}
+
+.fk-path.incoming-hl {
+  stroke: var(--accent-pk);
+  stroke-width: 2.5;
+  opacity: 1 !important;
+}
+
+.fk-path.dimmed {
+  opacity: 0.08 !important;
+}
+
+/* FLOATING TOOLTIP FOR RELATIONS */
+.rel-tooltip {
+  position: absolute;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  pointer-events: none;
+  z-index: 45;
+  display: none;
+  font-family: ui-monospace, monospace;
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+}
+
+/* ER TABLE CARD */
+.table-card {
+  position: absolute;
+  width: 260px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  z-index: 20;
+  cursor: default;
+  transition: border-color 0.15s ease, opacity 0.2s ease, box-shadow 0.15s ease;
+}
+
+.table-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.table-card.active-table {
+  border-color: var(--accent-fk);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+.table-card.highlight-parent {
+  border-color: var(--accent-pk);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
+}
+
+.table-card.highlight-child {
+  border-color: var(--accent-fk);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+.table-card.dimmed {
+  opacity: 0.14 !important;
+}
+
+.card-header {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafbfc;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.card-header:active {
+  cursor: grabbing;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.table-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.table-title:hover {
+  color: var(--accent-fk);
+  text-decoration: underline;
+}
+
+.card-rows-pill {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 0.05rem 0.35rem;
+  border-radius: 9999px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.card-body {
+  padding: 0.25rem 0;
+  font-size: 0.75rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.table-card.keys-only .card-body .col-row:not(.is-pk):not(.is-fk) {
+  display: none;
+}
+
+.col-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.75rem;
+  transition: background 0.1s ease;
+}
+
+.col-row:hover {
+  background: var(--bg-subtle);
+}
+
+.col-left {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.col-key-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.key-pk {
+  color: var(--accent-pk);
+}
+
+.key-fk {
+  color: var(--accent-fk);
+}
+
+.key-none {
+  opacity: 0;
+}
+
+.col-name {
+  font-family: ui-monospace, monospace;
+  font-size: 0.73rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.col-name.is-pk {
+  font-weight: 600;
+}
+
+.col-type {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, monospace;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.card-footer-info {
+  border-top: 1px solid var(--border);
+  padding: 0.35rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: #fafbfc;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.btn-inspect {
+  background: none;
+  border: none;
+  color: var(--accent-fk);
+  font-size: 0.68rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-inspect:hover {
+  text-decoration: underline;
+}
+
+/* MINIMAP */
+.minimap-panel {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  width: 180px;
+  height: 130px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  z-index: 30;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.minimap-canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.minimap-node {
+  position: absolute;
+  background: #94a3b8;
+  border-radius: 1px;
+}
+
+.minimap-viewport {
+  position: absolute;
+  border: 1.5px solid var(--accent-fk);
+  background: rgba(37, 99, 235, 0.08);
+  pointer-events: none;
+}
+
+/* FLOATING DETAIL DRAWER */
+.detail-drawer {
+  position: fixed;
+  top: 56px;
+  right: 0;
+  width: 440px;
+  height: calc(100vh - 56px);
+  background: #ffffff;
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.detail-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafbfc;
+}
+
+.drawer-title-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.drawer-table-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: ui-monospace, monospace;
+}
+
+.btn-close-drawer {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.btn-close-drawer:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+.drawer-section {
+  margin-bottom: 1.4rem;
+}
+
+.drawer-section:last-child {
+  margin-bottom: 0;
+}
+
+.drawer-sec-title {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-pills-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-pill-lg {
+  flex: 1;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem;
+  text-align: center;
+}
+
+.stat-pill-lg .val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.stat-pill-lg .lbl {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* DATA TABLES (INSPECTOR, GENERAL LIST, TRIGGERS, VIEWS, FKS) */
+.data-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  background: #fff;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.data-table th {
+  background: #f8fafc;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.data-table th.sortable {
+  cursor: pointer;
+}
+
+.data-table th.sortable:hover {
+  color: var(--text-main);
+  background: #f1f5f9;
+}
+
+.data-table td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background: #fbfcfe;
+}
+
+.code-cell {
+  font-family: ui-monospace, monospace;
+  font-size: 0.76rem;
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badge-pk {
+  background: var(--accent-pk-bg);
+  color: var(--accent-pk);
+  border-color: var(--accent-pk-border);
+}
+
+.badge-fk {
+  background: var(--accent-fk-bg);
+  color: var(--accent-fk);
+  border-color: var(--accent-fk-border);
+}
+
+.badge-uq {
+  background: var(--accent-uq-bg);
+  color: var(--accent-uq);
+}
+
+.badge-null {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.badge-notnull {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.badge-event-insert {
+  background: var(--badge-insert-bg);
+  color: var(--badge-insert);
+  border-color: #a7f3d0;
+}
+
+.badge-event-update {
+  background: var(--badge-update-bg);
+  color: var(--badge-update);
+  border-color: #fde68a;
+}
+
+.badge-event-delete {
+  background: var(--badge-delete-bg);
+  color: var(--badge-delete);
+  border-color: #fecaca;
+}
+
+/* FILTER BARS & CONTROLS */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.table-filter-input {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  outline: none;
+  width: 240px;
+}
+
+.table-filter-input:focus {
+  border-color: var(--text-main);
+}
+
+.select-filter {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  outline: none;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.table-link {
+  color: var(--accent-fk);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+}
+
+.table-link:hover {
+  text-decoration: underline;
+}
+
+/* SCROLLBARS */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+    </svg>
+    <span class="brand-title">db_test</span>
+    <span class="brand-subtitle">Diagrama Entidad-Relación Minimalista &bull; E-Commerce</span>
+  </div>
+
+  <nav class="nav-tabs" id="main-nav-tabs">
+    <button class="nav-tab active" data-tab="resumen">
+      Resumen General
+    </button>
+    <button class="nav-tab" data-tab="diagrama">
+      Diagrama ER
+      <span class="badge">27</span>
+    </button>
+    <button class="nav-tab" data-tab="detalle">
+      Detalle por Tabla
+    </button>
+    <button class="nav-tab" data-tab="triggers">
+      Triggers
+      <span class="badge">72</span>
+    </button>
+    <button class="nav-tab" data-tab="vistas">
+      Vistas
+      <span class="badge">25</span>
+    </button>
+    <button class="nav-tab" data-tab="fks">
+      Llaves Foráneas
+      <span class="badge">35</span>
+    </button>
+  </nav>
+
+  <div class="topbar-right">
+    <span class="chip-stat">Tablas: <strong>27</strong></span>
+    <span class="chip-stat">Columnas: <strong>224</strong></span>
+    <span class="chip-stat">Filas: <strong>~115,205</strong></span>
+  </div>
+</header>
+
+<!-- APPLICATION VIEWS -->
+<main class="app-content">
+
+  <!-- ==================== TAB 1: RESUMEN GENERAL ==================== -->
+  <section class="tab-pane active" id="pane-resumen">
+    <div class="resumen-container">
+      <div class="section-header">
+        <h1>Resumen de Arquitectura de Datos &mdash; db_test</h1>
+        <p>Modelo relacional completo de E-Commerce desplegado en MySQL 8.4 con compradores, vendedores, órdenes, pagos, envíos, devoluciones y trazabilidad integral.</p>
+      </div>
+
+      <!-- GLOBAL KPIS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Tablas</div>
+          <div class="kpi-value" id="kpi-tables">27</div>
+          <div class="kpi-sub">4 prefijos funcionales</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Columnas</div>
+          <div class="kpi-value" id="kpi-columns">224</div>
+          <div class="kpi-sub">Promedio ~8.3 por tabla</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Filas Registradas</div>
+          <div class="kpi-value" id="kpi-rows">115,205</div>
+          <div class="kpi-sub">Datos reales y simulaciones</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Llaves Foráneas</div>
+          <div class="kpi-value" id="kpi-fks">35</div>
+          <div class="kpi-sub">33 simples, 2 compuestas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Triggers Activos</div>
+          <div class="kpi-value" id="kpi-triggers">72</div>
+          <div class="kpi-sub">3 por cada tabla operativa</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Vistas SQL</div>
+          <div class="kpi-value" id="kpi-views">25</div>
+          <div class="kpi-sub">24 trazabilidad + 1 catálogo</div>
+        </div>
+      </div>
+
+      <!-- 2 COLUMN BREAKDOWN -->
+      <div class="grid-2col">
+        <!-- PREFIX GROUPS -->
+        <div class="panel-card">
+          <div class="panel-title">
+            <span>Distribución por Prefijo y Dominio</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">4 grupos</span>
+          </div>
+          <div class="prefix-list">
+            <div class="prefix-item">
+              <div class="prefix-info">
+                <span class="prefix-tag prefix-tb_">tb_</span>
+                <span class="prefix-desc">Principales / Transaccionales (usuarios, catálogo, bitácora, envíos)</span>
+              </div>
+              <div class="prefix-metrics">13 tablas &bull; 93,610 filas</div>
+            </div>
+            <div class="prefix-item">
+              <div class="prefix-info">
+                <span class="prefix-tag prefix-tbb_">tbb_</span>
+                <span class="prefix-desc">Cabeceras de Órdenes y Pedidos globales de clientes</span>
+              </div>
+              <div class="prefix-metrics">1 tabla &bull; 1 fila</div>
+            </div>
+            <div class="prefix-item">
+              <div class="prefix-info">
+                <span class="prefix-tag prefix-tbc_">tbc_</span>
+                <span class="prefix-desc">Catálogos maestros (categorías jerárquicas, métodos y tipos de pago)</span>
+              </div>
+              <div class="prefix-metrics">3 tablas &bull; 102 filas</div>
+            </div>
+            <div class="prefix-item">
+              <div class="prefix-info">
+                <span class="prefix-tag prefix-tbd_">tbd_</span>
+                <span class="prefix-desc">Detalle / Tablas intermedias (asociaciones N:M, detalles de órdenes, líneas)</span>
+              </div>
+              <div class="prefix-metrics">10 tablas &bull; 21,492 filas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP VOLUME TABLES -->
+        <div class="panel-card">
+          <div class="panel-title">
+            <span>Tablas con Mayor Volumen de Registros</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">Total acumulado</span>
+          </div>
+          <div class="top-table-bar">
+            <div class="table-bar-item">
+              <div class="bar-meta">
+                <span class="bar-table-name">tb_logs</span>
+                <span class="bar-count">58,149 filas (50.5%)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 100%;"></div></div>
+            </div>
+            <div class="table-bar-item">
+              <div class="bar-meta">
+                <span class="bar-table-name">tbd_products_categories</span>
+                <span class="bar-count">21,474 filas (18.6%)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 36.9%;"></div></div>
+            </div>
+            <div class="table-bar-item">
+              <div class="bar-meta">
+                <span class="bar-table-name">tb_products</span>
+                <span class="bar-count">15,007 filas (13.0%)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 25.8%;"></div></div>
+            </div>
+            <div class="table-bar-item">
+              <div class="bar-meta">
+                <span class="bar-table-name">tb_users</span>
+                <span class="bar-count">10,229 filas (8.9%)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 17.6%;"></div></div>
+            </div>
+            <div class="table-bar-item">
+              <div class="bar-meta">
+                <span class="bar-table-name">tb_people</span>
+                <span class="bar-count">10,223 filas (8.9%)</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width: 17.6%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIT ARCHITECTURE NOTICE -->
+      <div class="panel-card">
+        <div class="panel-title">Mecanismo de Trazabilidad y Auditoría en Tiempo Real</div>
+        <p style="font-size: 0.83rem; color: var(--text-muted); line-height: 1.6;">
+          La base de datos cuenta con <strong>72 triggers estandarizados</strong> (tres por cada una de las 24 tablas operativas: <code>AFTER INSERT</code>, <code>AFTER UPDATE</code>, <code>AFTER DELETE</code>). Cada operación mutante inserta una fila en <code>tb_logs</code> capturando el usuario remoto de conexión (<code>CURRENT_USER()</code>), fecha exacta, tipo de operación (Create, Update, Delete) y descripción con los identificadores involucrados. Las <strong>24 vistas <code>vw_trazabilidad_*</code></strong> cruzan la bitácora con los roles de seguridad de MySQL (<code>mysql.role_edges</code>) para ofrecer auditoría en tiempo real.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 2: DIAGRAMA ER ==================== -->
+  <section class="tab-pane" id="pane-diagrama">
+    <div class="diagram-pane" id="diagram-container">
+      
+      <!-- TOOLBAR -->
+      <div class="diagram-toolbar">
+        <div class="toolbar-group">
+          <!-- SEARCH TABLE -->
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="search-input" id="table-search" placeholder="Buscar tabla..." autocomplete="off">
+            <div class="search-dropdown" id="search-dropdown"></div>
+          </div>
+
+          <!-- GROUP FILTERS -->
+          <span style="height: 18px; width: 1px; background: var(--border); margin: 0 0.2rem;"></span>
+          <button class="filter-pill active" data-filter="all">Todas (27)</button>
+          <button class="filter-pill" data-filter="tb_">tb_ (13)</button>
+          <button class="filter-pill" data-filter="tbb_">tbb_ (1)</button>
+          <button class="filter-pill" data-filter="tbc_">tbc_ (3)</button>
+          <button class="filter-pill" data-filter="tbd_">tbd_ (10)</button>
+        </div>
+
+        <div class="toolbar-group">
+          <!-- CARD VIEW MODE -->
+          <button class="tool-btn active" id="btn-mode-full" title="Vista completa con columnas">Completo</button>
+          <button class="tool-btn" id="btn-mode-keys" title="Solo llaves PK y FK">Solo Llaves</button>
+
+          <!-- IMPLIED RELATIONS TOGGLE -->
+          <span style="height: 18px; width: 1px; background: var(--border); margin: 0 0.2rem;"></span>
+          <label style="font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+            <input type="checkbox" id="toggle-implied" style="cursor: pointer;">
+            Relaciones sugeridas
+          </label>
+
+          <!-- ZOOM / FIT BUTTONS -->
+          <span style="height: 18px; width: 1px; background: var(--border); margin: 0 0.2rem;"></span>
+          <button class="tool-btn" id="btn-zoom-in" title="Acercar">+</button>
+          <button class="tool-btn" id="btn-zoom-out" title="Alejar">&minus;</button>
+          <button class="tool-btn" id="btn-zoom-reset" title="Restablecer zoom">100%</button>
+          <button class="tool-btn" id="btn-fit-view" title="Ajustar diagrama a la pantalla">Ajustar</button>
+          <button class="tool-btn" id="btn-reset-layout" title="Restablecer posición original">Reiniciar</button>
+        </div>
+      </div>
+
+      <!-- CANVAS VIEWPORT -->
+      <div class="canvas-viewport" id="viewport">
+        <div class="canvas-world" id="world">
+          <!-- SVG CONNECTIONS LAYER -->
+          <svg class="canvas-svg" id="connections-svg">
+            <defs>
+              <!-- Crow's foot marker (N / Many side) with fork spreading toward table and perpendicular bar -->
+              <marker id="marker-crow" viewBox="0 0 16 16" refX="14" refY="8" markerWidth="14" markerHeight="14" orient="auto-start-reverse">
+                <path d="M 2 2 L 14 8 L 2 14" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <line x1="14" y1="1" x2="14" y2="15" stroke="#2563eb" stroke-width="1.8" />
+              </marker>
+              <!-- One marker (1 side) with double perpendicular bars -->
+              <marker id="marker-one" viewBox="0 0 16 16" refX="14" refY="8" markerWidth="14" markerHeight="14" orient="auto-start-reverse">
+                <line x1="8" y1="2" x2="8" y2="14" stroke="#d97706" stroke-width="1.8" />
+                <line x1="13" y1="2" x2="13" y2="14" stroke="#d97706" stroke-width="1.8" />
+              </marker>
+              <!-- Neutral markers for non-highlighted lines -->
+              <marker id="marker-crow-neutral" viewBox="0 0 16 16" refX="14" refY="8" markerWidth="14" markerHeight="14" orient="auto-start-reverse">
+                <path d="M 2 2 L 14 8 L 2 14" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <line x1="14" y1="1" x2="14" y2="15" stroke="#94a3b8" stroke-width="1.5" />
+              </marker>
+              <marker id="marker-one-neutral" viewBox="0 0 16 16" refX="14" refY="8" markerWidth="14" markerHeight="14" orient="auto-start-reverse">
+                <line x1="8" y1="2" x2="8" y2="14" stroke="#94a3b8" stroke-width="1.5" />
+                <line x1="13" y1="2" x2="13" y2="14" stroke="#94a3b8" stroke-width="1.5" />
+              </marker>
+            </defs>
+            <g id="svg-paths-group"></g>
+          </svg>
+
+          <!-- CARDS CONTAINER -->
+          <div id="cards-container"></div>
+        </div>
+      </div>
+
+      <!-- MINIMAP -->
+      <div class="minimap-panel" id="minimap">
+        <div class="minimap-canvas" id="minimap-canvas">
+          <div class="minimap-viewport" id="minimap-viewport"></div>
+        </div>
+      </div>
+
+      <!-- FLOATING TOOLTIP FOR RELATIONS -->
+      <div class="rel-tooltip" id="rel-tooltip"></div>
+
+    </div>
+  </section>
+
+  <!-- ==================== TAB 3: DETALLE POR TABLA ==================== -->
+  <section class="tab-pane" id="pane-detalle">
+    <div class="resumen-container">
+      <div class="section-header">
+        <h1>Diccionario y Detalle por Tabla</h1>
+        <p>Explora la estructura completa de columnas, tipos de datos, llaves primarias/foráneas, triggers y vistas asociadas.</p>
+      </div>
+
+      <!-- MASTER TABLE OF ALL TABLES -->
+      <div class="panel-card" style="margin-bottom: 2rem;">
+        <div class="filter-bar">
+          <div class="filter-left">
+            <input type="text" class="table-filter-input" id="filter-all-tables" placeholder="Filtrar por nombre o prefijo...">
+            <select class="select-filter" id="select-group-filter">
+              <option value="all">Todos los grupos (4)</option>
+              <option value="tb_">Principales (tb_)</option>
+              <option value="tbb_">Órdenes (tbb_)</option>
+              <option value="tbc_">Catálogos (tbc_)</option>
+              <option value="tbd_">Detalle (tbd_)</option>
+            </select>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--text-muted);" id="table-count-label">27 tablas</span>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table" id="master-tables-grid">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="name">Nombre de Tabla &#x25BE;</th>
+                <th class="sortable" data-sort="group">Grupo</th>
+                <th class="sortable" data-sort="cols" style="text-align: right;">Columnas</th>
+                <th class="sortable" data-sort="rows" style="text-align: right;">Filas</th>
+                <th style="text-align: center;">FK Salientes</th>
+                <th style="text-align: center;">FK Entrantes</th>
+                <th style="text-align: center;">Triggers</th>
+                <th style="text-align: center;">Vistas</th>
+                <th style="text-align: center;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="master-tables-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SELECTED TABLE DETAIL VIEW -->
+      <div class="panel-card" id="table-inspector-panel">
+        <div class="panel-title" style="margin-bottom: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span class="prefix-tag" id="inspector-prefix">tb_</span>
+            <span style="font-size: 1.25rem; font-family: ui-monospace, monospace; font-weight: 700;" id="inspector-name">tb_users</span>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <span class="chip-stat" id="inspector-cols-pill"><strong>8</strong> columnas</span>
+            <span class="chip-stat" id="inspector-rows-pill"><strong>10,229</strong> filas</span>
+          </div>
+        </div>
+        <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.25rem;" id="inspector-desc"></p>
+
+        <!-- COLUMNS TABLE -->
+        <h3 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.6rem;">Columnas y Restricciones</h3>
+        <div class="data-table-wrap" style="margin-bottom: 1.5rem;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">#</th>
+                <th>Columna</th>
+                <th>Tipo de Dato</th>
+                <th>Llaves / Roles</th>
+                <th>Nulabilidad</th>
+                <th>Valor Predeterminado</th>
+                <th>Extra</th>
+              </tr>
+            </thead>
+            <tbody id="inspector-cols-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- RELATIONS & AUDIT -->
+        <div class="grid-2col" style="margin-bottom: 0;">
+          <div>
+            <h3 style="font-size: 0.88rem; font-weight: 600; margin-bottom: 0.6rem;">Llaves Foráneas Salientes (Hacia otras tablas)</h3>
+            <div id="inspector-fks-out" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
+
+            <h3 style="font-size: 0.88rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem;">Llaves Foráneas Entrantes (Referenciada por)</h3>
+            <div id="inspector-fks-in" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
+          </div>
+
+          <div>
+            <h3 style="font-size: 0.88rem; font-weight: 600; margin-bottom: 0.6rem;">Triggers de Auditoría</h3>
+            <div id="inspector-triggers" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
+
+            <h3 style="font-size: 0.88rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem;">Vistas Relacionadas</h3>
+            <div id="inspector-views" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 4: TRIGGERS ==================== -->
+  <section class="tab-pane" id="pane-triggers">
+    <div class="resumen-container">
+      <div class="section-header">
+        <h1>Catálogo de Triggers de Auditoría (72)</h1>
+        <p>Todos los triggers se ejecutan en momento <code>AFTER</code> e insertan eventos estandarizados en <code>tb_logs</code>.</p>
+      </div>
+
+      <div class="panel-card">
+        <div class="filter-bar">
+          <div class="filter-left">
+            <input type="text" class="table-filter-input" id="filter-triggers-search" placeholder="Buscar por nombre o tabla...">
+            <select class="select-filter" id="filter-triggers-table">
+              <option value="all">Todas las tablas (24)</option>
+            </select>
+            <button class="filter-pill active" data-trg-event="all">Todos (72)</button>
+            <button class="filter-pill" data-trg-event="INSERT">AFTER INSERT (24)</button>
+            <button class="filter-pill" data-trg-event="UPDATE">AFTER UPDATE (24)</button>
+            <button class="filter-pill" data-trg-event="DELETE">AFTER DELETE (24)</button>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--text-muted);" id="triggers-count-label">72 triggers</span>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Nombre del Trigger</th>
+                <th>Tabla Afectada</th>
+                <th>Momento</th>
+                <th>Evento</th>
+                <th>Destino de Auditoría</th>
+                <th>Operación Registrada</th>
+              </tr>
+            </thead>
+            <tbody id="triggers-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 5: VISTAS ==================== -->
+  <section class="tab-pane" id="pane-vistas">
+    <div class="resumen-container">
+      <div class="section-header">
+        <h1>Catálogo de Vistas SQL (25)</h1>
+        <p>24 vistas de trazabilidad cruzadas con roles remotos y 1 vista de jerarquía recursiva de productos por categoría.</p>
+      </div>
+
+      <div class="panel-card">
+        <div class="filter-bar">
+          <div class="filter-left">
+            <input type="text" class="table-filter-input" id="filter-views-search" placeholder="Buscar por nombre o tabla base...">
+            <button class="filter-pill active" data-view-type="all">Todas (25)</button>
+            <button class="filter-pill" data-view-type="trazabilidad">Trazabilidad (24)</button>
+            <button class="filter-pill" data-view-type="catalogo">Catálogo / CTE (1)</button>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--text-muted);" id="views-count-label">25 vistas</span>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Nombre de Vista</th>
+                <th>Tabla Base</th>
+                <th>Tipo</th>
+                <th>Objetivo y Alcance</th>
+                <th>Lógica SQL</th>
+              </tr>
+            </thead>
+            <tbody id="views-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 6: LLAVES FORÁNEAS ==================== -->
+  <section class="tab-pane" id="pane-fks">
+    <div class="resumen-container">
+      <div class="section-header">
+        <h1>Matriz de Integridad Referencial &mdash; Llaves Foráneas (35)</h1>
+        <p>Relaciones entre tablas origen y destino, restricciones referenciales, reglas de borrado/actualización y cardinalidad.</p>
+      </div>
+
+      <div class="panel-card">
+        <div class="filter-bar">
+          <div class="filter-left">
+            <input type="text" class="table-filter-input" id="filter-fks-search" placeholder="Buscar tabla u columna...">
+            <select class="select-filter" id="filter-fks-table">
+              <option value="all">Todas las tablas origen</option>
+            </select>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--text-muted);" id="fks-count-label">35 relaciones</span>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">#</th>
+                <th>Tabla Origen (Hija)</th>
+                <th>Columna Origen</th>
+                <th style="text-align: center;"></th>
+                <th>Tabla Destino (Padre)</th>
+                <th>Columna Destino</th>
+                <th>Constraint</th>
+                <th>ON DELETE</th>
+                <th>ON UPDATE</th>
+                <th>Tipo</th>
+              </tr>
+            </thead>
+            <tbody id="fks-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FLOATING DETAIL DRAWER (FOR ER DIAGRAM) -->
+<div class="detail-drawer" id="diagram-drawer">
+  <div class="drawer-header">
+    <div class="drawer-title-area">
+      <span class="prefix-tag" id="drawer-prefix">tb_</span>
+      <span class="drawer-table-name" id="drawer-table-name">tb_users</span>
+    </div>
+    <button class="btn-close-drawer" id="btn-close-drawer" title="Cerrar panel">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  
+  <div class="drawer-body">
+    <div class="stat-pills-row">
+      <div class="stat-pill-lg">
+        <div class="val" id="drawer-cols-count">8</div>
+        <div class="lbl">Columnas</div>
+      </div>
+      <div class="stat-pill-lg">
+        <div class="val" id="drawer-rows-count">10,229</div>
+        <div class="lbl">Filas</div>
+      </div>
+    </div>
+
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;" id="drawer-desc"></p>
+
+    <!-- COLUMNS LIST -->
+    <div class="drawer-section">
+      <div class="drawer-sec-title">Columnas</div>
+      <div class="data-table-wrap">
+        <table class="data-table" style="font-size: 0.74rem;">
+          <thead>
+            <tr>
+              <th>Columna</th>
+              <th>Tipo</th>
+              <th>Llave</th>
+              <th>Nulo</th>
+            </tr>
+          </thead>
+          <tbody id="drawer-cols-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OUTGOING FKS -->
+    <div class="drawer-section">
+      <div class="drawer-sec-title">FKs Salientes (<span id="drawer-fks-out-count">0</span>)</div>
+      <div id="drawer-fks-out" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.76rem;"></div>
+    </div>
+
+    <!-- INCOMING FKS -->
+    <div class="drawer-section">
+      <div class="drawer-sec-title">FKs Entrantes (<span id="drawer-fks-in-count">0</span>)</div>
+      <div id="drawer-fks-in" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.76rem;"></div>
+    </div>
+
+    <!-- TRIGGERS -->
+    <div class="drawer-section">
+      <div class="drawer-sec-title">Triggers Asociados (<span id="drawer-triggers-count">0</span>)</div>
+      <div id="drawer-triggers-list" style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.76rem;"></div>
+    </div>
+
+    <!-- VIEWS -->
+    <div class="drawer-section">
+      <div class="drawer-sec-title">Vistas Asociadas (<span id="drawer-views-count">0</span>)</div>
+      <div id="drawer-views-list" style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.76rem;"></div>
+    </div>
+
+    <button class="tool-btn" id="drawer-btn-full" style="width: 100%; justify-content: center; padding: 0.6rem; margin-top: 1rem;">
+      Ver en Diccionario Completo &rarr;
+    </button>
+  </div>
+</div>
+
+<!-- EMBEDDED DATA & APPLICATION LOGIC -->
+<script>
+const DB_MODEL = {"summary": {"tables_count": 27, "columns_count": 224, "rows_count": 115205, "fks_count": 35, "triggers_count": 72, "views_count": 25}, "tables": {"tb_buyer_orders": {"name": "tb_buyer_orders", "description": "Historial y control de órdenes consolidadas desde la perspectiva del comprador.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 0, "columns_count": 8, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "seller_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "tb_buyer_orders_ibfk_1"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "subtotal", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "shipping_cost", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "fulfillment_status", "type": "enum('Pending','Accepted','Preparing','Sent','Delivered','Canceled','Returned')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Pending'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [{"constraint": "tb_buyer_orders_ibfk_1", "from_cols": ["seller_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [], "pos": {"x": 680, "y": 1100}}, "tb_cancellations": {"name": "tb_cancellations", "description": "Registro de cancelaciones de pagos y compras solicitadas por usuarios o el sistema.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 0, "columns_count": 8, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "payment_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_payments", "target_column": "payment_ID", "constraint": "fk_cancellations_payment"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "requested_by_user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_cancellations_user"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "reason", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "cancellation_status", "type": "enum('Pending','Approved','Rejected','Completed')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Pending'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [{"constraint": "fk_cancellations_payment", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_cancellations_user", "from_cols": ["requested_by_user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [], "pos": {"x": 1120, "y": 1340}}, "tb_carts": {"name": "tb_carts", "description": "Carritos principales activos asociados de manera unívoca a los usuarios.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 1, "columns_count": 5, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "tb_carts_ibfk_1"}], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [{"constraint": "tb_carts_ibfk_1", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [["user_ID"]], "checks": [], "pos": {"x": 1080, "y": 80}}, "tb_logs": {"name": "tb_logs", "description": "Bitácora centralizada de auditoría y trazabilidad transaccional (Create, Read, Update, Delete).", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 58149, "columns_count": 7, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "table_name", "type": "varchar(100)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "operation", "type": "enum('Create','Read','Update','Delete')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "db_user", "type": "varchar(80)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "description", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "operation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "operation_status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "b'1'"}], "pks": ["ID"], "fks": [], "uniques": [], "checks": [], "pos": {"x": 1940, "y": 720}}, "tb_payment_transactions": {"name": "tb_payment_transactions", "description": "Historial de transacciones bancarias y pasarelas de pago ejecutadas.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 0, "columns_count": 11, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "payment_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_payments", "target_column": "payment_ID", "constraint": "fk_payment_transactions_payment"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "transaction_type", "type": "enum('Charge','Refund','Authorization','Void')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Charge'"}, {"name": "amount", "type": "decimal(10,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "currency", "type": "varchar(3)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'MXN'"}, {"name": "gateway_transaction_id", "type": "varchar(255)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "gateway_response", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": null}, {"name": "operation_status", "type": "enum('Pending','Completed','Failed','Cancelled')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Pending'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [{"constraint": "fk_payment_transactions_payment", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "chk_transaction_amount", "condition": "(`amount` >= 0"}], "pos": {"x": 280, "y": 1600}}, "tb_people": {"name": "tb_people", "description": "Información personal y perfil demográfico extendido de los usuarios.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 10223, "columns_count": 12, "columns": [{"name": "person_ID", "type": "bigint", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_people_users"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "courtesy_title_ID", "type": "char(3)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "given_names", "type": "varchar(150)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "family_names", "type": "varchar(150)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "birth_date", "type": "date", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "gender", "type": "enum('Masculino','Femenino','Prefiero no decirlo')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Prefiero no decirlo'"}, {"name": "country_code", "type": "char(2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "phone", "type": "varchar(25)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["person_ID"], "fks": [{"constraint": "fk_people_users", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [], "pos": {"x": 680, "y": 60}}, "tb_products": {"name": "tb_products", "description": "Catálogo maestro de productos con SKU, precio, existencias y estado activo/inactivo.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 15007, "columns_count": 9, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "SKU", "type": "varchar(50)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "name", "type": "varchar(250)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "description", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": null}, {"name": "current_price", "type": "decimal(10,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "current_stock", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [], "uniques": [["SKU"]], "checks": [], "pos": {"x": 1520, "y": 360}}, "tb_refunds": {"name": "tb_refunds", "description": "Gestión y trazabilidad de reembolsos monetarios por cancelaciones o devoluciones.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 0, "columns_count": 11, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "payment_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_payments", "target_column": "payment_ID", "constraint": "fk_refunds_payment"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "cancellation_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_cancellations", "target_column": "ID", "constraint": "fk_refunds_cancellation"}], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "return_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_returns", "target_column": "ID", "constraint": "fk_refunds_return"}], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "refund_amount", "type": "decimal(10,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "refund_reason", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "refund_status", "type": "enum('Pending','Processing','Completed','Failed')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Pending'"}, {"name": "gateway_refund_id", "type": "varchar(255)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [{"constraint": "fk_refunds_cancellation", "from_cols": ["cancellation_ID"], "to_table": "tb_cancellations", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_refunds_payment", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_refunds_return", "from_cols": ["return_ID"], "to_table": "tb_returns", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "chk_refund_amount", "condition": "(`refund_amount` >= 0"}], "pos": {"x": 1340, "y": 1620}}, "tb_returns": {"name": "tb_returns", "description": "Solicitudes y seguimiento de devoluciones físicas de productos comprados.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 0, "columns_count": 10, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "payment_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_payments", "target_column": "payment_ID", "constraint": "fk_returns_payment"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_products", "target_column": "ID", "constraint": "fk_returns_product"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_returns_user"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "quantity", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'1'"}, {"name": "return_reason", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "return_status", "type": "enum('Requested','Received','Inspected','Accepted','Rejected')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Requested'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [{"constraint": "fk_returns_payment", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_returns_product", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_returns_user", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "chk_returns_quantity", "condition": "(`quantity` > 0"}], "pos": {"x": 1560, "y": 1340}}, "tb_seller_orders": {"name": "tb_seller_orders", "description": "Sub-órdenes divididas y asignadas a cada vendedor involucrado en la transacción.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 0, "columns_count": 8, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "seller_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "tb_seller_orders_ibfk_1"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "subtotal", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "shipping_cost", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "fulfillment_status", "type": "enum('Pending','Accepted','Preparing','Sent','Delivered','Canceled','Returned')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Pending'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [{"constraint": "tb_seller_orders_ibfk_1", "from_cols": ["seller_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "tb_seller_orders_chk_1", "condition": "(`subtotal` >= 0"}, {"name": "tb_seller_orders_chk_2", "condition": "(`shipping_cost` >= 0"}], "pos": {"x": 1080, "y": 1100}}, "tb_shipments": {"name": "tb_shipments", "description": "Control logístico y guías de envío asociadas a los pagos confirmados.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 0, "columns_count": 12, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "payment_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_payments", "target_column": "payment_ID", "constraint": "fk_shipments_payment"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "shipping_company", "type": "varchar(100)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'E-commerce Logistics'"}, {"name": "tracking_number", "type": "varchar(100)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "shipping_cost", "type": "decimal(10,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.00'"}, {"name": "shipping_status", "type": "enum('Pending','Preparing','Shipped','In_Transit','Delivered','Failed')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Pending'"}, {"name": "shipped_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "estimated_delivery_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "actual_delivery_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [{"constraint": "fk_shipments_payment", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "chk_shipping_cost", "condition": "(`shipping_cost` >= 0"}], "pos": {"x": 680, "y": 1600}}, "tb_user_addresses": {"name": "tb_user_addresses", "description": "Direcciones físicas de entrega registradas por cada usuario.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 1, "columns_count": 12, "columns": [{"name": "ID", "type": "bigint", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_addresses_users"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "address_label", "type": "varchar(100)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "recipient_name", "type": "varchar(150)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "recipient_phone", "type": "varchar(25)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "delivery_instructions", "type": "varchar(500)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "latitude", "type": "decimal(10,7)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "longitude", "type": "decimal(10,7)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "is_default", "type": "tinyint(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [{"constraint": "fk_addresses_users", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "chk_coordinates", "condition": "(((`latitude` is null"}, {"name": "chk_latitude", "condition": "(`latitude` between -(90"}, {"name": "chk_longitude", "condition": "(`longitude` between -(180"}], "pos": {"x": 320, "y": 260}}, "tb_users": {"name": "tb_users", "description": "Cuentas de usuario del sistema, credenciales de acceso y estado general.", "prefix": "tb_", "group": "Principales / Transaccionales", "rows": 10229, "columns_count": 8, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "email", "type": "varchar(80)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "nickname", "type": "varchar(100)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "password", "type": "varchar(255)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_login", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}], "pks": ["ID"], "fks": [], "uniques": [["email"], ["nickname"]], "checks": [], "pos": {"x": 680, "y": 380}}, "tbb_orders": {"name": "tbb_orders", "description": "Cabecera principal del pedido global generado por el cliente comprador.", "prefix": "tbb_", "group": "Órdenes", "rows": 1, "columns_count": 9, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "key", "type": "varchar(40)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "User_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_orders_user"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "total_products", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "total_cost", "type": "decimal(10,3)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0.000'"}, {"name": "status_string", "type": "enum('Registered','Wishlist','Payed','Canceled','Delivered','Devolved','Attended','Sended')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Registered'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [{"constraint": "fk_orders_user", "from_cols": ["User_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [["key"]], "checks": [], "pos": {"x": 680, "y": 820}}, "tbc_categories": {"name": "tbc_categories", "description": "Catálogo taxonómico jerárquico de categorías y subcategorías de productos.", "prefix": "tbc_", "group": "Catálogos", "rows": 100, "columns_count": 7, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "name", "type": "varchar(120)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "description", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": null}, {"name": "sup_id_category", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbc_categories", "target_column": "ID", "constraint": "fk_superior_category"}], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [{"constraint": "fk_superior_category", "from_cols": ["sup_id_category"], "to_table": "tbc_categories", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [["name"]], "checks": [], "pos": {"x": 1940, "y": 80}}, "tbc_payment_methods": {"name": "tbc_payment_methods", "description": "Catálogo de métodos y pasarelas de pago disponibles en la plataforma.", "prefix": "tbc_", "group": "Catálogos", "rows": 1, "columns_count": 6, "columns": [{"name": "payment_method_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "method_name", "type": "varchar(60)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "description", "type": "varchar(255)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["payment_method_ID"], "fks": [], "uniques": [["method_name"]], "checks": [], "pos": {"x": 280, "y": 1320}}, "tbc_payment_methods_types": {"name": "tbc_payment_methods_types", "description": "Catálogo de tipos de tarjetas y medios de pago guardados (crédito, débito, billetera).", "prefix": "tbc_", "group": "Catálogos", "rows": 1, "columns_count": 6, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "code", "type": "varchar(30)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "description", "type": "text", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [], "uniques": [["code"]], "checks": [], "pos": {"x": 30, "y": 560}}, "tbd_address_components": {"name": "tbd_address_components", "description": "Componentes normalizados de direcciones con jerarquía geográfica autorreferencial.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 6, "columns_count": 8, "columns": [{"name": "ID", "type": "bigint", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": true, "default": null}, {"name": "address_ID", "type": "bigint", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_user_addresses", "target_column": "ID", "constraint": "fk_component_address"}, {"target_table": "tbd_address_components", "target_column": "address_ID", "constraint": "fk_component_parent"}], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "value", "type": "varchar(255)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "component_type", "type": "varchar(50)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "address_sup_ID", "type": "bigint", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_address_components", "target_column": "ID", "constraint": "fk_component_parent"}], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [{"constraint": "fk_component_address", "from_cols": ["address_ID"], "to_table": "tb_user_addresses", "to_cols": ["ID"], "on_delete": "RESTRICT", "on_update": "NO ACTION"}, {"constraint": "fk_component_parent", "from_cols": ["address_ID", "address_sup_ID"], "to_table": "tbd_address_components", "to_cols": ["address_ID", "ID"], "on_delete": "RESTRICT", "on_update": "NO ACTION"}], "uniques": [["address_ID", "ID"]], "checks": [], "pos": {"x": 30, "y": 260}}, "tbd_carts_items": {"name": "tbd_carts_items", "description": "Detalle de artículos contenidos en el carrito de compras.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 5, "columns_count": 5, "columns": [{"name": "cart_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "provider_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "quantity", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["cart_ID", "provider_ID", "product_ID"], "fks": [], "uniques": [], "checks": [], "pos": {"x": 1080, "y": 580}}, "tbd_order_details": {"name": "tbd_order_details", "description": "Desglose de líneas de productos comprados en un pedido con precio unitario y cantidad.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 0, "columns_count": 8, "columns": [{"name": "order_detail_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "order_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbb_orders", "target_column": "ID", "constraint": "fk_order_details_order"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_products", "target_column": "ID", "constraint": "fk_order_details_product"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "quantity", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'1'"}, {"name": "unit_price", "type": "decimal(10,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "subtotal", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": null}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["order_detail_ID"], "fks": [{"constraint": "fk_order_details_order", "from_cols": ["order_ID"], "to_table": "tbb_orders", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_order_details_product", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "chk_order_details_price", "condition": "(`unit_price` >= 0"}, {"name": "chk_order_details_quantity", "condition": "(`quantity` > 0"}], "pos": {"x": 1080, "y": 820}}, "tbd_order_items": {"name": "tbd_order_items", "description": "Artículos específicos vinculados a pedidos de vendedor con proveedor y producto.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 0, "columns_count": 9, "columns": [{"name": "ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "seller_order_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_seller_orders", "target_column": "ID", "constraint": "tbd_order_items_ibfk_1"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_users_offer_products", "target_column": "product_ID", "constraint": "tbd_order_items_ibfk_2"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "provider_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbd_users_offer_products", "target_column": "user_ID", "constraint": "tbd_order_items_ibfk_2"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_name", "type": "varchar(255)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "quantity", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "unit_price", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "subtotal", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": null}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["ID"], "fks": [{"constraint": "tbd_order_items_ibfk_1", "from_cols": ["seller_order_ID"], "to_table": "tb_seller_orders", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "tbd_order_items_ibfk_2", "from_cols": ["provider_ID", "product_ID"], "to_table": "tbd_users_offer_products", "to_cols": ["user_ID", "product_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [{"name": "tbd_order_items_chk_1", "condition": "(`quantity` > 0"}, {"name": "tbd_order_items_chk_2", "condition": "(`unit_price` >= 0"}], "pos": {"x": 1520, "y": 1100}}, "tbd_payments": {"name": "tbd_payments", "description": "Registro y comprobación de pago asociado a una orden global.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 1, "columns_count": 9, "columns": [{"name": "payment_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "order_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbb_orders", "target_column": "ID", "constraint": "fk_payments_order"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "payment_method_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbc_payment_methods", "target_column": "payment_method_ID", "constraint": "fk_payments_method"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "amount", "type": "decimal(12,2)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "payment_status", "type": "enum('Pendiente','Procesando','Pagado','Rechazado','Reembolsado','Cancelado')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'Pendiente'"}, {"name": "transaction_reference", "type": "varchar(100)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "payment_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["payment_ID"], "fks": [{"constraint": "fk_payments_method", "from_cols": ["payment_method_ID"], "to_table": "tbc_payment_methods", "to_cols": ["payment_method_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_payments_order", "from_cols": ["order_ID"], "to_table": "tbb_orders", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [["transaction_reference"]], "checks": [{"name": "chk_payment_amount", "condition": "(`amount` > 0"}], "pos": {"x": 680, "y": 1320}}, "tbd_products_categories": {"name": "tbd_products_categories", "description": "Asociación N:M entre productos y múltiples categorías taxonómicas.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 21474, "columns_count": 5, "columns": [{"name": "category_ID", "type": "int", "is_pk": true, "is_fk": true, "fk_refs": [{"target_table": "tbc_categories", "target_column": "ID", "constraint": "fk_category"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_ID", "type": "int", "is_pk": true, "is_fk": true, "fk_refs": [{"target_table": "tb_products", "target_column": "ID", "constraint": "fk_product"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["category_ID", "product_ID"], "fks": [{"constraint": "fk_category", "from_cols": ["category_ID"], "to_table": "tbc_categories", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_product", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [], "pos": {"x": 1520, "y": 80}}, "tbd_shopping_cart": {"name": "tbd_shopping_cart", "description": "Líneas de productos guardados en el carrito de compras por usuario.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 0, "columns_count": 6, "columns": [{"name": "cart_item_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_cart_user"}], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_products", "target_column": "ID", "constraint": "fk_cart_product"}], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "quantity", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}], "pks": ["cart_item_ID"], "fks": [{"constraint": "fk_cart_product", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_cart_user", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "CASCADE", "on_update": "NO ACTION"}], "uniques": [["user_ID", "product_ID"]], "checks": [{"name": "chk_cart_quantity", "condition": "(`quantity` > 0"}], "pos": {"x": 1080, "y": 340}}, "tbd_user_payment_methods": {"name": "tbd_user_payment_methods", "description": "Instrumentos y métodos de pago guardados y configurados por cada usuario.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 1, "columns_count": 11, "columns": [{"name": "ID", "type": "bigint", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "tbd_user_payment_methods_ibfk_1"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "payment_method_type_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tbc_payment_methods_types", "target_column": "ID", "constraint": "tbd_user_payment_methods_ibfk_2"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "provider", "type": "varchar(60)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "provider_method_ref", "type": "varchar(255)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "label", "type": "varchar(100)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "last_four", "type": "char(4)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "is_default", "type": "tinyint(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'0'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["ID"], "fks": [{"constraint": "tbd_user_payment_methods_ibfk_1", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "tbd_user_payment_methods_ibfk_2", "from_cols": ["payment_method_type_ID"], "to_table": "tbc_payment_methods_types", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [["provider", "provider_method_ref"]], "checks": [], "pos": {"x": 320, "y": 560}}, "tbd_users_offer_products": {"name": "tbd_users_offer_products", "description": "Catálogo de productos ofrecidos por vendedores con precios y comisiones específicas.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 0, "columns_count": 9, "columns": [{"name": "product_offer_ID", "type": "int", "is_pk": true, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": true, "default": null}, {"name": "user_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_offer_user"}], "is_unique": true, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "product_ID", "type": "int", "is_pk": false, "is_fk": true, "fk_refs": [{"target_table": "tb_products", "target_column": "ID", "constraint": "fk_offer_product"}], "is_unique": true, "nullable": false, "auto_increment": false, "default": null}, {"name": "type_ownership", "type": "enum('Owner','Reseller','Distributor')", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "available_stock", "type": "int", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "'1'"}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "available_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": true, "auto_increment": false, "default": "NULL"}], "pks": ["product_offer_ID"], "fks": [{"constraint": "fk_offer_product", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_offer_user", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [["user_ID", "product_ID"]], "checks": [], "pos": {"x": 1520, "y": 720}}, "tbd_users_wishlist_proudcts": {"name": "tbd_users_wishlist_proudcts", "description": "Lista de deseos (favoritos) guardada por los compradores.", "prefix": "tbd_", "group": "Detalle / Intermedias", "rows": 5, "columns_count": 5, "columns": [{"name": "user_ID", "type": "int", "is_pk": true, "is_fk": true, "fk_refs": [{"target_table": "tb_users", "target_column": "ID", "constraint": "fk_user2"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "product_ID", "type": "int", "is_pk": true, "is_fk": true, "fk_refs": [{"target_table": "tb_products", "target_column": "ID", "constraint": "fk_products3"}], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}, {"name": "status", "type": "bit(1)", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "b'1'"}, {"name": "creation_date", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": "CURRENT_TIMESTAMP"}, {"name": "last_update", "type": "datetime", "is_pk": false, "is_fk": false, "fk_refs": [], "is_unique": false, "nullable": false, "auto_increment": false, "default": null}], "pks": ["user_ID", "product_ID"], "fks": [{"constraint": "fk_products3", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_user2", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "uniques": [], "checks": [], "pos": {"x": 1940, "y": 360}}}, "triggers": [{"name": "trg_tb_cancellations_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_cancellations", "log_table": "tb_logs"}, {"name": "trg_tb_cancellations_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_cancellations", "log_table": "tb_logs"}, {"name": "trg_tb_cancellations_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_cancellations", "log_table": "tb_logs"}, {"name": "trg_tb_carts_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_carts", "log_table": "tb_logs"}, {"name": "trg_tb_carts_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_carts", "log_table": "tb_logs"}, {"name": "trg_tb_carts_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_carts", "log_table": "tb_logs"}, {"name": "trg_tb_payment_transactions_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_payment_transactions", "log_table": "tb_logs"}, {"name": "trg_tb_payment_transactions_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_payment_transactions", "log_table": "tb_logs"}, {"name": "trg_tb_payment_transactions_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_payment_transactions", "log_table": "tb_logs"}, {"name": "trg_people_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_people", "log_table": "tb_logs"}, {"name": "trg_people_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_people", "log_table": "tb_logs"}, {"name": "trg_people_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_people", "log_table": "tb_logs"}, {"name": "tr_products_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_products", "log_table": "tb_logs"}, {"name": "tr_products_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_products", "log_table": "tb_logs"}, {"name": "tr_products_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_products", "log_table": "tb_logs"}, {"name": "trg_tb_refunds_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_refunds", "log_table": "tb_logs"}, {"name": "trg_tb_refunds_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_refunds", "log_table": "tb_logs"}, {"name": "trg_tb_refunds_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_refunds", "log_table": "tb_logs"}, {"name": "trg_tb_returns_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_returns", "log_table": "tb_logs"}, {"name": "trg_tb_returns_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_returns", "log_table": "tb_logs"}, {"name": "trg_tb_returns_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_returns", "log_table": "tb_logs"}, {"name": "trg_seller_orders_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_seller_orders", "log_table": "tb_logs"}, {"name": "trg_seller_orders_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_seller_orders", "log_table": "tb_logs"}, {"name": "trg_seller_orders_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_seller_orders", "log_table": "tb_logs"}, {"name": "trg_tb_shipments_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_shipments", "log_table": "tb_logs"}, {"name": "trg_tb_shipments_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_shipments", "log_table": "tb_logs"}, {"name": "trg_tb_shipments_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_shipments", "log_table": "tb_logs"}, {"name": "trg_tb_user_addresses_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_user_addresses", "log_table": "tb_logs"}, {"name": "trg_tb_user_addresses_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_user_addresses", "log_table": "tb_logs"}, {"name": "trg_tb_user_addresses_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_user_addresses", "log_table": "tb_logs"}, {"name": "trg_users_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tb_users", "log_table": "tb_logs"}, {"name": "trg_users_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tb_users", "log_table": "tb_logs"}, {"name": "trg_users_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tb_users", "log_table": "tb_logs"}, {"name": "trg_tbb_orders_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbb_orders", "log_table": "tb_logs"}, {"name": "trg_tbb_orders_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbb_orders", "log_table": "tb_logs"}, {"name": "trg_tbb_orders_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbb_orders", "log_table": "tb_logs"}, {"name": "trg_tb_categories_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbc_categories", "log_table": "tb_logs"}, {"name": "trg_tb_categories_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbc_categories", "log_table": "tb_logs"}, {"name": "trg_tb_categories_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbc_categories", "log_table": "tb_logs"}, {"name": "trg_tbc_payment_methods_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbc_payment_methods", "log_table": "tb_logs"}, {"name": "trg_tbc_payment_methods_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbc_payment_methods", "log_table": "tb_logs"}, {"name": "trg_tbc_payment_methods_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbc_payment_methods", "log_table": "tb_logs"}, {"name": "trg_tbc_payment_methods_types_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbc_payment_methods_types", "log_table": "tb_logs"}, {"name": "trg_tbc_payment_methods_types_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbc_payment_methods_types", "log_table": "tb_logs"}, {"name": "trg_tbc_payment_methods_types_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbc_payment_methods_types", "log_table": "tb_logs"}, {"name": "trg_tbd_address_components_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_address_components", "log_table": "tb_logs"}, {"name": "trg_tbd_address_components_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_address_components", "log_table": "tb_logs"}, {"name": "trg_tbd_address_components_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_address_components", "log_table": "tb_logs"}, {"name": "trg_tbd_order_details_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_order_details", "log_table": "tb_logs"}, {"name": "trg_tbd_order_details_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_order_details", "log_table": "tb_logs"}, {"name": "trg_tbd_order_details_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_order_details", "log_table": "tb_logs"}, {"name": "trg_tbd_order_items_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_order_items", "log_table": "tb_logs"}, {"name": "trg_tbd_order_items_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_order_items", "log_table": "tb_logs"}, {"name": "trg_tbd_order_items_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_order_items", "log_table": "tb_logs"}, {"name": "trg_tbd_payments_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_payments", "log_table": "tb_logs"}, {"name": "trg_tbd_payments_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_payments", "log_table": "tb_logs"}, {"name": "trg_tbd_payments_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_payments", "log_table": "tb_logs"}, {"name": "trg_tbd_products_categories_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_products_categories", "log_table": "tb_logs"}, {"name": "trg_tbd_products_categories_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_products_categories", "log_table": "tb_logs"}, {"name": "trg_tbd_products_categories_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_products_categories", "log_table": "tb_logs"}, {"name": "trg_tbd_shopping_cart_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_shopping_cart", "log_table": "tb_logs"}, {"name": "trg_tbd_shopping_cart_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_shopping_cart", "log_table": "tb_logs"}, {"name": "trg_tbd_shopping_cart_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_shopping_cart", "log_table": "tb_logs"}, {"name": "trg_tbd_user_payment_methods_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_user_payment_methods", "log_table": "tb_logs"}, {"name": "trg_tbd_user_payment_methods_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_user_payment_methods", "log_table": "tb_logs"}, {"name": "trg_tbd_user_payment_methods_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_user_payment_methods", "log_table": "tb_logs"}, {"name": "trg_users_offer_products_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_users_offer_products", "log_table": "tb_logs"}, {"name": "trg_users_offer_products_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_users_offer_products", "log_table": "tb_logs"}, {"name": "trg_users_offer_products_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_users_offer_products", "log_table": "tb_logs"}, {"name": "trg_tbd_users_wishlist_proudcts_after_insert", "timing": "AFTER", "event": "INSERT", "table": "tbd_users_wishlist_proudcts", "log_table": "tb_logs"}, {"name": "trg_tbd_users_wishlist_proudcts_after_update", "timing": "AFTER", "event": "UPDATE", "table": "tbd_users_wishlist_proudcts", "log_table": "tb_logs"}, {"name": "trg_tbd_users_wishlist_proudcts_after_delete", "timing": "AFTER", "event": "DELETE", "table": "tbd_users_wishlist_proudcts", "log_table": "tb_logs"}], "views": [{"name": "vw_total_products_by_category", "base_table": "tbc_categories, tb_products, tbd_products_categories", "description": "Calcula jerarquía recursiva de categorías, productos activos/inactivos y totales por categoría."}, {"name": "vw_trazabilidad_cancelaciones", "base_table": "tb_cancellations", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_cancellations cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_carrito_compras", "base_table": "tbd_shopping_cart", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_shopping_cart cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_carritos", "base_table": "tb_carts", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_carts cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_categorias", "base_table": "tbc_categories", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbc_categories cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_componentes_direccion", "base_table": "tbd_address_components", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_address_components cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_detalle_ordenes", "base_table": "tbd_order_details", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_order_details cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_devoluciones", "base_table": "tb_returns", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_returns cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_direcciones_usuario", "base_table": "tb_user_addresses", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_user_addresses cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_envios", "base_table": "tb_shipments", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_shipments cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_items_orden_vendedor", "base_table": "tbd_order_items", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_order_items cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_lista_deseos", "base_table": "tbd_users_wishlist_proudcts", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_users_wishlist_proudcts cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_metodos_pago", "base_table": "tbc_payment_methods", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbc_payment_methods cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_metodos_pago_usuario", "base_table": "tbd_user_payment_methods", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_user_payment_methods cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_ordenes", "base_table": "tbb_orders", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbb_orders cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_ordenes_vendedor", "base_table": "tb_seller_orders", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_seller_orders cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_pagos", "base_table": "tbd_payments", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_payments cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_personas", "base_table": "tb_people", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_people cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_productos", "base_table": "tb_products", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_products cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_productos_categorias", "base_table": "tbd_products_categories", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_products_categories cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_reembolsos", "base_table": "tb_refunds", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_refunds cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_tipos_metodos_pago", "base_table": "tbc_payment_methods_types", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbc_payment_methods_types cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_transacciones_pago", "base_table": "tb_payment_transactions", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_payment_transactions cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_users_offer_products", "base_table": "tbd_users_offer_products", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tbd_users_offer_products cruzando tb_logs y roles de usuario."}, {"name": "vw_trazabilidad_usuarios", "base_table": "tb_users", "description": "Auditoría y trazabilidad completa de cambios (Create, Read, Update, Delete) sobre tb_users cruzando tb_logs y roles de usuario."}], "foreign_keys": [{"constraint": "tb_buyer_orders_ibfk_1", "from_table": "tb_buyer_orders", "from_cols": ["seller_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_cancellations_payment", "from_table": "tb_cancellations", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_cancellations_user", "from_table": "tb_cancellations", "from_cols": ["requested_by_user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "tb_carts_ibfk_1", "from_table": "tb_carts", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_payment_transactions_payment", "from_table": "tb_payment_transactions", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_people_users", "from_table": "tb_people", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_refunds_cancellation", "from_table": "tb_refunds", "from_cols": ["cancellation_ID"], "to_table": "tb_cancellations", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_refunds_payment", "from_table": "tb_refunds", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_refunds_return", "from_table": "tb_refunds", "from_cols": ["return_ID"], "to_table": "tb_returns", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_returns_payment", "from_table": "tb_returns", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_returns_product", "from_table": "tb_returns", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_returns_user", "from_table": "tb_returns", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "tb_seller_orders_ibfk_1", "from_table": "tb_seller_orders", "from_cols": ["seller_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_shipments_payment", "from_table": "tb_shipments", "from_cols": ["payment_ID"], "to_table": "tbd_payments", "to_cols": ["payment_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_addresses_users", "from_table": "tb_user_addresses", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_orders_user", "from_table": "tbb_orders", "from_cols": ["User_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_superior_category", "from_table": "tbc_categories", "from_cols": ["sup_id_category"], "to_table": "tbc_categories", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_component_address", "from_table": "tbd_address_components", "from_cols": ["address_ID"], "to_table": "tb_user_addresses", "to_cols": ["ID"], "on_delete": "RESTRICT", "on_update": "NO ACTION"}, {"constraint": "fk_component_parent", "from_table": "tbd_address_components", "from_cols": ["address_ID", "address_sup_ID"], "to_table": "tbd_address_components", "to_cols": ["address_ID", "ID"], "on_delete": "RESTRICT", "on_update": "NO ACTION"}, {"constraint": "fk_order_details_order", "from_table": "tbd_order_details", "from_cols": ["order_ID"], "to_table": "tbb_orders", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_order_details_product", "from_table": "tbd_order_details", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "tbd_order_items_ibfk_1", "from_table": "tbd_order_items", "from_cols": ["seller_order_ID"], "to_table": "tb_seller_orders", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "tbd_order_items_ibfk_2", "from_table": "tbd_order_items", "from_cols": ["provider_ID", "product_ID"], "to_table": "tbd_users_offer_products", "to_cols": ["user_ID", "product_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_payments_method", "from_table": "tbd_payments", "from_cols": ["payment_method_ID"], "to_table": "tbc_payment_methods", "to_cols": ["payment_method_ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_payments_order", "from_table": "tbd_payments", "from_cols": ["order_ID"], "to_table": "tbb_orders", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_category", "from_table": "tbd_products_categories", "from_cols": ["category_ID"], "to_table": "tbc_categories", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_product", "from_table": "tbd_products_categories", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_cart_product", "from_table": "tbd_shopping_cart", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_cart_user", "from_table": "tbd_shopping_cart", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "CASCADE", "on_update": "NO ACTION"}, {"constraint": "tbd_user_payment_methods_ibfk_1", "from_table": "tbd_user_payment_methods", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "tbd_user_payment_methods_ibfk_2", "from_table": "tbd_user_payment_methods", "from_cols": ["payment_method_type_ID"], "to_table": "tbc_payment_methods_types", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_offer_product", "from_table": "tbd_users_offer_products", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_offer_user", "from_table": "tbd_users_offer_products", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_products3", "from_table": "tbd_users_wishlist_proudcts", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}, {"constraint": "fk_user2", "from_table": "tbd_users_wishlist_proudcts", "from_cols": ["user_ID"], "to_table": "tb_users", "to_cols": ["ID"], "on_delete": "NO ACTION", "on_update": "NO ACTION"}], "implied_fks": [{"from_table": "tbd_carts_items", "from_cols": ["cart_ID"], "to_table": "tb_carts", "to_cols": ["ID"], "is_implied": true, "note": "Relación conceptual entre línea de carrito y carrito de usuario"}, {"from_table": "tbd_carts_items", "from_cols": ["product_ID"], "to_table": "tb_products", "to_cols": ["ID"], "is_implied": true, "note": "Relación conceptual con catálogo de productos"}, {"from_table": "tbd_carts_items", "from_cols": ["provider_ID"], "to_table": "tb_users", "to_cols": ["ID"], "is_implied": true, "note": "Relación conceptual con el proveedor/vendedor"}]};
+
+// APPLICATION STATE
+const state = {
+  activeTab: 'resumen',
+  hasFitDiagram: false,
+  viewMode: 'full', // 'full' | 'keys'
+  prefixFilter: 'all',
+  showImplied: false,
+  selectedTable: null,
+  zoom: 0.75,
+  panX: 60,
+  panY: 30,
+  isPanning: false,
+  startX: 0,
+  startY: 0,
+  draggingTable: null,
+  dragMoved: false,
+  dragOffsetX: 0,
+  dragOffsetY: 0,
+  hoveredTable: null,
+  tableSortCol: 'name',
+  tableSortAsc: true
+};
+
+// INITIALIZATION
+document.addEventListener('DOMContentLoaded', () => {
+  setupNavigation();
+  initERDiagram();
+  renderMasterTables();
+  renderTriggers();
+  renderViews();
+  renderForeignKeys();
+  inspectTable('tb_users');
+});
+
+// NAVIGATION TABS
+function setupNavigation() {
+  const tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      switchTab(target);
+    });
+  });
+}
+
+function switchTab(tabId) {
+  state.activeTab = tabId;
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tabId);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => {
+    p.classList.toggle('active', p.id === `pane-${tabId}`);
+  });
+
+  if (tabId === 'diagrama') {
+    requestAnimationFrame(() => {
+      if (!state.hasFitDiagram) {
+        fitDiagramToScreen();
+        state.hasFitDiagram = true;
+      }
+      updateTransform();
+      renderAllLines();
+      updateMinimap();
+    });
+  }
+}
+
+// ==================== DIAGRAMA ER INTERACTIVO ====================
+function initERDiagram() {
+  const viewport = document.getElementById('viewport');
+  const world = document.getElementById('world');
+  const cardsContainer = document.getElementById('cards-container');
+
+  // Render cards
+  cardsContainer.innerHTML = '';
+  Object.values(DB_MODEL.tables).forEach(tbl => {
+    const card = createTableCard(tbl);
+    cardsContainer.appendChild(card);
+  });
+
+  // Pan events using pointer events for touch & mouse support
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.table-card')) return;
+    state.isPanning = true;
+    viewport.classList.add('panning');
+    state.startX = e.clientX - state.panX;
+    state.startY = e.clientY - state.panY;
+    viewport.setPointerCapture(e.pointerId);
+  });
+
+  viewport.addEventListener('pointermove', (e) => {
+    if (state.isPanning) {
+      state.panX = e.clientX - state.startX;
+      state.panY = e.clientY - state.startY;
+      updateTransform();
+      updateMinimap();
+    }
+  });
+
+  viewport.addEventListener('pointerup', (e) => {
+    if (state.isPanning) {
+      state.isPanning = false;
+      viewport.classList.remove('panning');
+      try { viewport.releasePointerCapture(e.pointerId); } catch(err) {}
+    }
+  });
+
+  viewport.addEventListener('pointercancel', () => {
+    state.isPanning = false;
+    viewport.classList.remove('panning');
+  });
+
+  // Zoom with mousewheel
+  viewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+    const newZoom = Math.min(2.0, Math.max(0.3, state.zoom * zoomFactor));
+
+    const rect = viewport.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    state.panX = mouseX - (mouseX - state.panX) * (newZoom / state.zoom);
+    state.panY = mouseY - (mouseY - state.panY) * (newZoom / state.zoom);
+    state.zoom = newZoom;
+
+    updateTransform();
+    updateMinimap();
+  }, { passive: false });
+
+  // Toolbar events
+  document.getElementById('btn-zoom-in').addEventListener('click', () => {
+    zoomBy(1.15);
+  });
+  document.getElementById('btn-zoom-out').addEventListener('click', () => {
+    zoomBy(0.85);
+  });
+  document.getElementById('btn-zoom-reset').addEventListener('click', () => {
+    state.zoom = 1.0;
+    updateTransform();
+    updateMinimap();
+  });
+  document.getElementById('btn-fit-view').addEventListener('click', fitDiagramToScreen);
+  document.getElementById('btn-reset-layout').addEventListener('click', resetLayoutPositions);
+
+  // View mode toggles
+  const btnFull = document.getElementById('btn-mode-full');
+  const btnKeys = document.getElementById('btn-mode-keys');
+
+  btnFull.addEventListener('click', () => {
+    state.viewMode = 'full';
+    btnFull.classList.add('active');
+    btnKeys.classList.remove('active');
+    document.querySelectorAll('.table-card').forEach(c => c.classList.remove('keys-only'));
+    renderAllLines();
+  });
+
+  btnKeys.addEventListener('click', () => {
+    state.viewMode = 'keys';
+    btnKeys.classList.add('active');
+    btnFull.classList.remove('active');
+    document.querySelectorAll('.table-card').forEach(c => c.classList.add('keys-only'));
+    renderAllLines();
+  });
+
+  // Implied relations checkbox
+  document.getElementById('toggle-implied').addEventListener('change', (e) => {
+    state.showImplied = e.target.checked;
+    renderAllLines();
+  });
+
+  // Prefix filter pills in toolbar
+  document.querySelectorAll('.diagram-toolbar .filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.diagram-toolbar .filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const filter = pill.dataset.filter;
+      state.prefixFilter = filter;
+      applyPrefixFilter();
+    });
+  });
+
+  // Table search input
+  setupTableSearch();
+
+  // Drawer events
+  document.getElementById('btn-close-drawer').addEventListener('click', closeDrawer);
+  document.getElementById('drawer-btn-full').addEventListener('click', () => {
+    if (state.selectedTable) {
+      inspectTable(state.selectedTable);
+      switchTab('detalle');
+      closeDrawer();
+    }
+  });
+
+  // Window resize recomputes transform
+  window.addEventListener('resize', () => {
+    if (state.activeTab === 'diagrama') {
+      updateMinimap();
+    }
+  });
+}
+
+function zoomBy(factor) {
+  const viewport = document.getElementById('viewport');
+  const rect = viewport.getBoundingClientRect();
+  const cx = rect.width / 2;
+  const cy = rect.height / 2;
+  const newZoom = Math.min(2.0, Math.max(0.3, state.zoom * factor));
+
+  state.panX = cx - (cx - state.panX) * (newZoom / state.zoom);
+  state.panY = cy - (cy - state.panY) * (newZoom / state.zoom);
+  state.zoom = newZoom;
+
+  updateTransform();
+  updateMinimap();
+}
+
+function fitDiagramToScreen() {
+  const viewport = document.getElementById('viewport');
+  const rect = viewport.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  Object.values(DB_MODEL.tables).forEach(t => {
+    const cardWidth = 260;
+    const cardHeight = state.viewMode === 'full' ? 260 : 130;
+    minX = Math.min(minX, t.pos.x);
+    minY = Math.min(minY, t.pos.y);
+    maxX = Math.max(maxX, t.pos.x + cardWidth);
+    maxY = Math.max(maxY, t.pos.y + cardHeight);
+  });
+
+  const padding = 70;
+  const boxWidth = maxX - minX + padding * 2;
+  const boxHeight = maxY - minY + padding * 2;
+
+  const scaleX = rect.width / boxWidth;
+  const scaleY = rect.height / boxHeight;
+  const fitZoom = Math.min(1.0, Math.max(0.35, Math.min(scaleX, scaleY)));
+
+  state.zoom = fitZoom;
+  state.panX = (rect.width - boxWidth * fitZoom) / 2 - (minX - padding) * fitZoom;
+  state.panY = (rect.height - boxHeight * fitZoom) / 2 - (minY - padding) * fitZoom + 25;
+
+  updateTransform();
+  updateMinimap();
+}
+
+function resetLayoutPositions() {
+  const original = {
+    "tb_people": {x: 680, y: 60},
+    "tb_users": {x: 680, y: 380},
+    "tb_user_addresses": {x: 320, y: 260},
+    "tbd_address_components": {x: 30, y: 260},
+    "tbc_payment_methods_types": {x: 30, y: 560},
+    "tbd_user_payment_methods": {x: 320, y: 560},
+    "tb_carts": {x: 1080, y: 80},
+    "tbd_shopping_cart": {x: 1080, y: 340},
+    "tbd_carts_items": {x: 1080, y: 580},
+    "tbc_categories": {x: 1940, y: 80},
+    "tbd_products_categories": {x: 1520, y: 80},
+    "tb_products": {x: 1520, y: 360},
+    "tbd_users_wishlist_proudcts": {x: 1940, y: 360},
+    "tbd_users_offer_products": {x: 1520, y: 720},
+    "tbb_orders": {x: 680, y: 820},
+    "tbd_order_details": {x: 1080, y: 820},
+    "tb_buyer_orders": {x: 680, y: 1100},
+    "tb_seller_orders": {x: 1080, y: 1100},
+    "tbd_order_items": {x: 1520, y: 1100},
+    "tbc_payment_methods": {x: 280, y: 1320},
+    "tbd_payments": {x: 680, y: 1320},
+    "tb_payment_transactions": {x: 280, y: 1600},
+    "tb_shipments": {x: 680, y: 1600},
+    "tb_cancellations": {x: 1120, y: 1340},
+    "tb_returns": {x: 1560, y: 1340},
+    "tb_refunds": {x: 1340, y: 1620},
+    "tb_logs": {x: 1940, y: 720}
+  };
+
+  Object.entries(original).forEach(([tname, p]) => {
+    if (DB_MODEL.tables[tname]) {
+      DB_MODEL.tables[tname].pos.x = p.x;
+      DB_MODEL.tables[tname].pos.y = p.y;
+      const card = document.getElementById(`card-${tname}`);
+      if (card) {
+        card.style.left = `${p.x}px`;
+        card.style.top = `${p.y}px`;
+      }
+    }
+  });
+
+  renderAllLines();
+  fitDiagramToScreen();
+}
+
+function updateTransform() {
+  const world = document.getElementById('world');
+  world.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+}
+
+// CREATE TABLE CARD DOM
+function createTableCard(tbl) {
+  const card = document.createElement('div');
+  card.className = `table-card prefix-${tbl.prefix}`;
+  card.id = `card-${tbl.name}`;
+  card.dataset.table = tbl.name;
+  card.dataset.prefix = tbl.prefix;
+  card.style.left = `${tbl.pos.x}px`;
+  card.style.top = `${tbl.pos.y}px`;
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'card-header';
+  header.innerHTML = `
+    <div class="header-left">
+      <span class="table-prefix prefix-${tbl.prefix}">${tbl.prefix}</span>
+      <span class="table-title" title="${tbl.name}">${tbl.name}</span>
+    </div>
+    <span class="card-rows-pill">${formatNumber(tbl.rows)} f</span>
+  `;
+
+  // Drag handler on header using Pointer Events
+  let startClientX = 0, startClientY = 0;
+  header.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    state.draggingTable = card;
+    state.dragMoved = false;
+    startClientX = e.clientX;
+    startClientY = e.clientY;
+    state.dragOffsetX = (e.clientX - state.panX) / state.zoom - tbl.pos.x;
+    state.dragOffsetY = (e.clientY - state.panY) / state.zoom - tbl.pos.y;
+    header.setPointerCapture(e.pointerId);
+  });
+
+  header.addEventListener('pointermove', (e) => {
+    if (state.draggingTable === card) {
+      if (Math.abs(e.clientX - startClientX) > 3 || Math.abs(e.clientY - startClientY) > 3) {
+        state.dragMoved = true;
+      }
+      const newX = (e.clientX - state.panX) / state.zoom - state.dragOffsetX;
+      const newY = (e.clientY - state.panY) / state.zoom - state.dragOffsetY;
+
+      tbl.pos.x = Math.max(10, Math.min(2320, newX));
+      tbl.pos.y = Math.max(10, Math.min(1820, newY));
+
+      card.style.left = `${tbl.pos.x}px`;
+      card.style.top = `${tbl.pos.y}px`;
+
+      renderAllLines();
+      updateMinimap();
+    }
+  });
+
+  header.addEventListener('pointerup', (e) => {
+    if (state.draggingTable === card) {
+      state.draggingTable = null;
+      try { header.releasePointerCapture(e.pointerId); } catch(err) {}
+      if (!state.dragMoved) {
+        openDrawer(tbl.name);
+      }
+    }
+  });
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'card-body';
+
+  tbl.columns.forEach(col => {
+    const row = document.createElement('div');
+    row.className = `col-row ${col.is_pk ? 'is-pk' : ''} ${col.is_fk ? 'is-fk' : ''}`;
+    
+    // Key Icon
+    let keyIconHtml = '<span class="col-key-icon key-none">&bull;</span>';
+    if (col.is_pk) {
+      keyIconHtml = `
+        <span class="col-key-icon key-pk" title="Llave Primaria (PK)">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 14c-2.76 0-5-2.24-5-5s2.24-5 5-5c2.42 0 4.44 1.72 4.9 4h7.1l2 2-2 2-1-1-1 1-1-1-1.1 1.1c-.56-.69-1.42-1.1-2.9-1.1-2.76 0-5 2.24-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+        </span>
+      `;
+    } else if (col.is_fk) {
+      keyIconHtml = `
+        <span class="col-key-icon key-fk" title="Llave Foránea (FK)">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+        </span>
+      `;
+    }
+
+    row.innerHTML = `
+      <div class="col-left">
+        ${keyIconHtml}
+        <span class="col-name ${col.is_pk ? 'is-pk' : ''}">${col.name}</span>
+      </div>
+      <span class="col-type">${formatShortType(col.type)}</span>
+    `;
+
+    body.appendChild(row);
+  });
+
+  // Footer
+  const footer = document.createElement('div');
+  footer.className = 'card-footer-info';
+  footer.innerHTML = `
+    <span>${tbl.columns_count} cols &bull; ${tbl.fks.length} FK</span>
+    <button class="btn-inspect" data-table="${tbl.name}">Inspeccionar &rarr;</button>
+  `;
+
+  card.appendChild(header);
+  card.appendChild(body);
+  card.appendChild(footer);
+
+  // Hover highlight
+  card.addEventListener('mouseenter', () => {
+    highlightTableRelations(tbl.name);
+  });
+  card.addEventListener('mouseleave', () => {
+    clearHighlightRelations();
+  });
+
+  // Click inspect
+  body.addEventListener('click', () => {
+    openDrawer(tbl.name);
+  });
+
+  footer.querySelector('.btn-inspect').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openDrawer(tbl.name);
+  });
+
+  return card;
+}
+
+function formatShortType(type) {
+  if (!type) return '';
+  if (type.startsWith('enum(')) return 'enum';
+  return type.toLowerCase();
+}
+
+function formatNumber(num) {
+  return Number(num).toLocaleString('es-MX');
+}
+
+// ==================== CROW'S FOOT ORTHOGONAL LINES ====================
+function renderAllLines() {
+  const g = document.getElementById('svg-paths-group');
+  g.innerHTML = '';
+
+  const linesToRender = [];
+
+  // Declared FKs
+  DB_MODEL.foreign_keys.forEach((fk, idx) => {
+    linesToRender.push({
+      id: `fk-${idx}`,
+      from: fk.from_table,
+      to: fk.to_table,
+      fromCol: fk.from_cols.join(', '),
+      toCol: fk.to_cols.join(', '),
+      constraint: fk.constraint,
+      onDelete: fk.on_delete,
+      onUpdate: fk.on_update,
+      isImplied: false
+    });
+  });
+
+  // Implied FKs
+  if (state.showImplied && DB_MODEL.implied_fks) {
+    DB_MODEL.implied_fks.forEach((ifk, idx) => {
+      linesToRender.push({
+        id: `ifk-${idx}`,
+        from: ifk.from_table,
+        to: ifk.to_table,
+        fromCol: ifk.from_cols.join(', '),
+        toCol: ifk.to_cols.join(', '),
+        constraint: ifk.note,
+        onDelete: 'SUGERIDA',
+        onUpdate: 'SUGERIDA',
+        isImplied: true
+      });
+    });
+  }
+
+  linesToRender.forEach(rel => {
+    const cardFrom = document.getElementById(`card-${rel.from}`);
+    const cardTo = document.getElementById(`card-${rel.to}`);
+
+    if (!cardFrom || !cardTo) return;
+
+    // Filter check: if both tables are filtered out, don't draw
+    if (cardFrom.style.display === 'none' && cardTo.style.display === 'none') return;
+
+    const fromTbl = DB_MODEL.tables[rel.from];
+    const toTbl = DB_MODEL.tables[rel.to];
+
+    const w1 = cardFrom.offsetWidth || 260;
+    const h1 = cardFrom.offsetHeight || 220;
+    const w2 = cardTo.offsetWidth || 260;
+    const h2 = cardTo.offsetHeight || 220;
+
+    const x1 = fromTbl.pos.x;
+    const y1 = fromTbl.pos.y;
+    const x2 = toTbl.pos.x;
+    const y2 = toTbl.pos.y;
+
+    // Self-referential relationship
+    if (rel.from === rel.to) {
+      const pathD = `M ${x1 + w1} ${y1 + 40} H ${x1 + w1 + 35} V ${y1 - 25} H ${x1 + 100} V ${y1}`;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathD);
+      path.setAttribute('class', `fk-path ${rel.isImplied ? 'implied' : ''}`);
+      path.setAttribute('id', `path-${rel.id}`);
+      path.dataset.from = rel.from;
+      path.dataset.to = rel.to;
+      path.dataset.desc = `${rel.from}.${rel.fromCol} → ${rel.to}.${rel.toCol} (Auto-referencia)`;
+      path.setAttribute('marker-start', 'url(#marker-crow-neutral)');
+      path.setAttribute('marker-end', 'url(#marker-one-neutral)');
+
+      attachLineEvents(path, rel);
+      g.appendChild(path);
+      return;
+    }
+
+    const cx1 = x1 + w1 / 2;
+    const cy1 = y1 + h1 / 2;
+    const cx2 = x2 + w2 / 2;
+    const cy2 = y2 + h2 / 2;
+
+    let startX, startY, endX, endY;
+    let pathD = '';
+
+    const dx = cx2 - cx1;
+    const dy = cy2 - cy1;
+
+    // Manhattan orthogonal routing
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0) {
+        // Child is left of Parent
+        startX = x1 + w1;
+        startY = y1 + Math.min(h1 - 20, Math.max(25, cy1 - y1 + (Math.sin(rel.id.length) * 16)));
+        endX = x2;
+        endY = y2 + Math.min(h2 - 20, Math.max(25, cy2 - y2 + (Math.cos(rel.id.length) * 16)));
+        const midX = (startX + endX) / 2;
+        pathD = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
+      } else {
+        // Child is right of Parent
+        startX = x1;
+        startY = y1 + Math.min(h1 - 20, Math.max(25, cy1 - y1 + (Math.sin(rel.id.length) * 16)));
+        endX = x2 + w2;
+        endY = y2 + Math.min(h2 - 20, Math.max(25, cy2 - y2 + (Math.cos(rel.id.length) * 16)));
+        const midX = (startX + endX) / 2;
+        pathD = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
+      }
+    } else {
+      if (dy > 0) {
+        // Child is above Parent
+        startX = x1 + Math.min(w1 - 20, Math.max(25, cx1 - x1));
+        startY = y1 + h1;
+        endX = x2 + Math.min(w2 - 20, Math.max(25, cx2 - x2));
+        endY = y2;
+        const midY = (startY + endY) / 2;
+        pathD = `M ${startX} ${startY} V ${midY} H ${endX} V ${endY}`;
+      } else {
+        // Child is below Parent
+        startX = x1 + Math.min(w1 - 20, Math.max(25, cx1 - x1));
+        startY = y1;
+        endX = x2 + Math.min(w2 - 20, Math.max(25, cx2 - x2));
+        endY = y2 + h2;
+        const midY = (startY + endY) / 2;
+        pathD = `M ${startX} ${startY} V ${midY} H ${endX} V ${endY}`;
+      }
+    }
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathD);
+    path.setAttribute('class', `fk-path ${rel.isImplied ? 'implied' : ''}`);
+    path.setAttribute('id', `path-${rel.id}`);
+    path.dataset.from = rel.from;
+    path.dataset.to = rel.to;
+    path.dataset.desc = `${rel.from}.${rel.fromCol} → ${rel.to}.${rel.toCol} (1:N) • ${rel.constraint}`;
+    path.setAttribute('marker-start', 'url(#marker-crow-neutral)');
+    path.setAttribute('marker-end', 'url(#marker-one-neutral)');
+
+    attachLineEvents(path, rel);
+    g.appendChild(path);
+  });
+}
+
+function attachLineEvents(path, rel) {
+  const tooltip = document.getElementById('rel-tooltip');
+
+  path.addEventListener('mouseenter', (e) => {
+    path.setAttribute('marker-start', 'url(#marker-crow)');
+    path.setAttribute('marker-end', 'url(#marker-one)');
+    highlightSpecificLine(rel.from, rel.to);
+
+    tooltip.textContent = path.dataset.desc;
+    tooltip.style.display = 'block';
+    tooltip.style.left = `${e.clientX + 12}px`;
+    tooltip.style.top = `${e.clientY - 28}px`;
+  });
+
+  path.addEventListener('mousemove', (e) => {
+    tooltip.style.left = `${e.clientX + 12}px`;
+    tooltip.style.top = `${e.clientY - 28}px`;
+  });
+
+  path.addEventListener('mouseleave', () => {
+    path.setAttribute('marker-start', 'url(#marker-crow-neutral)');
+    path.setAttribute('marker-end', 'url(#marker-one-neutral)');
+    clearHighlightRelations();
+    tooltip.style.display = 'none';
+  });
+
+  path.addEventListener('click', () => {
+    openDrawer(rel.from);
+  });
+}
+
+// HOVER HIGHLIGHTING
+function highlightTableRelations(tableName) {
+  state.hoveredTable = tableName;
+
+  const outgoingPaths = [];
+  const incomingPaths = [];
+
+  document.querySelectorAll('.fk-path').forEach(p => {
+    const from = p.dataset.from;
+    const to = p.dataset.to;
+
+    if (from === tableName) {
+      p.classList.add('highlighted');
+      p.classList.remove('dimmed', 'incoming-hl');
+      p.setAttribute('marker-start', 'url(#marker-crow)');
+      p.setAttribute('marker-end', 'url(#marker-one)');
+      outgoingPaths.push(to);
+    } else if (to === tableName) {
+      p.classList.add('incoming-hl');
+      p.classList.remove('dimmed', 'highlighted');
+      p.setAttribute('marker-start', 'url(#marker-crow)');
+      p.setAttribute('marker-end', 'url(#marker-one)');
+      incomingPaths.push(from);
+    } else {
+      p.classList.add('dimmed');
+      p.classList.remove('highlighted', 'incoming-hl');
+      p.setAttribute('marker-start', 'url(#marker-crow-neutral)');
+      p.setAttribute('marker-end', 'url(#marker-one-neutral)');
+    }
+  });
+
+  document.querySelectorAll('.table-card').forEach(card => {
+    const tname = card.dataset.table;
+    if (tname === tableName) {
+      card.classList.add('active-table');
+      card.classList.remove('dimmed', 'highlight-parent', 'highlight-child');
+    } else if (outgoingPaths.includes(tname)) {
+      card.classList.add('highlight-parent');
+      card.classList.remove('dimmed', 'active-table', 'highlight-child');
+    } else if (incomingPaths.includes(tname)) {
+      card.classList.add('highlight-child');
+      card.classList.remove('dimmed', 'active-table', 'highlight-parent');
+    } else {
+      card.classList.add('dimmed');
+      card.classList.remove('active-table', 'highlight-parent', 'highlight-child');
+    }
+  });
+}
+
+function highlightSpecificLine(fromTable, toTable) {
+  document.querySelectorAll('.table-card').forEach(card => {
+    const tname = card.dataset.table;
+    if (tname === fromTable) {
+      card.classList.add('highlight-child');
+      card.classList.remove('dimmed');
+    } else if (tname === toTable) {
+      card.classList.add('highlight-parent');
+      card.classList.remove('dimmed');
+    } else {
+      card.classList.add('dimmed');
+    }
+  });
+}
+
+function clearHighlightRelations() {
+  state.hoveredTable = null;
+  document.querySelectorAll('.table-card').forEach(c => {
+    c.classList.remove('active-table', 'highlight-parent', 'highlight-child', 'dimmed');
+  });
+  document.querySelectorAll('.fk-path').forEach(p => {
+    p.classList.remove('highlighted', 'incoming-hl', 'dimmed');
+    p.setAttribute('marker-start', 'url(#marker-crow-neutral)');
+    p.setAttribute('marker-end', 'url(#marker-one-neutral)');
+  });
+}
+
+function applyPrefixFilter() {
+  document.querySelectorAll('.table-card').forEach(card => {
+    const pfx = card.dataset.prefix;
+    if (state.prefixFilter === 'all' || pfx === state.prefixFilter) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  renderAllLines();
+}
+
+// TABLE SEARCH IN TOOLBAR
+function setupTableSearch() {
+  const input = document.getElementById('table-search');
+  const dropdown = document.getElementById('search-dropdown');
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    dropdown.innerHTML = '';
+    if (!q) {
+      dropdown.classList.remove('open');
+      return;
+    }
+
+    const matches = Object.keys(DB_MODEL.tables).filter(t => t.toLowerCase().includes(q));
+    if (matches.length === 0) {
+      dropdown.innerHTML = '<div style="padding: 0.5rem; font-size: 0.75rem; color: #94a3b8;">Sin coincidencias</div>';
+    } else {
+      matches.slice(0, 10).forEach(tname => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.innerHTML = `<span>${tname}</span> <span style="font-size: 0.68rem; color: #94a3b8;">${DB_MODEL.tables[tname].columns_count} cols</span>`;
+        item.addEventListener('click', () => {
+          centerOnTable(tname);
+          dropdown.classList.remove('open');
+          input.value = tname;
+        });
+        dropdown.appendChild(item);
+      });
+    }
+    dropdown.classList.add('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-box')) {
+      dropdown.classList.remove('open');
+    }
+  });
+}
+
+function centerOnTable(tableName) {
+  const tbl = DB_MODEL.tables[tableName];
+  if (!tbl) return;
+
+  const viewport = document.getElementById('viewport');
+  const rect = viewport.getBoundingClientRect();
+
+  state.panX = rect.width / 2 - (tbl.pos.x + 130) * state.zoom;
+  state.panY = rect.height / 2 - (tbl.pos.y + 110) * state.zoom;
+
+  updateTransform();
+  updateMinimap();
+
+  const card = document.getElementById(`card-${tableName}`);
+  if (card) {
+    card.classList.add('active-table');
+    highlightTableRelations(tableName);
+  }
+}
+
+// ==================== MINIMAP ====================
+function updateMinimap() {
+  const canvas = document.getElementById('minimap-canvas');
+  const vpRect = document.getElementById('minimap-viewport');
+  const viewport = document.getElementById('viewport');
+  if (!viewport) return;
+
+  const mapW = canvas.offsetWidth || 180;
+  const mapH = canvas.offsetHeight || 130;
+  const worldW = 2600;
+  const worldH = 2000;
+
+  const scaleX = mapW / worldW;
+  const scaleY = mapH / worldH;
+
+  if (canvas.querySelectorAll('.minimap-node').length === 0) {
+    Object.values(DB_MODEL.tables).forEach(t => {
+      const node = document.createElement('div');
+      node.className = 'minimap-node';
+      node.id = `m-node-${t.name}`;
+      node.style.left = `${t.pos.x * scaleX}px`;
+      node.style.top = `${t.pos.y * scaleY}px`;
+      node.style.width = `${Math.max(3, 260 * scaleX)}px`;
+      node.style.height = `${Math.max(3, 180 * scaleY)}px`;
+      canvas.appendChild(node);
+    });
+  } else {
+    Object.values(DB_MODEL.tables).forEach(t => {
+      const node = document.getElementById(`m-node-${t.name}`);
+      if (node) {
+        node.style.left = `${t.pos.x * scaleX}px`;
+        node.style.top = `${t.pos.y * scaleY}px`;
+      }
+    });
+  }
+
+  const vWidth = viewport.offsetWidth;
+  const vHeight = viewport.offsetHeight;
+
+  const vx = (-state.panX / state.zoom) * scaleX;
+  const vy = (-state.panY / state.zoom) * scaleY;
+  const vw = (vWidth / state.zoom) * scaleX;
+  const vh = (vHeight / state.zoom) * scaleY;
+
+  vpRect.style.left = `${Math.max(0, vx)}px`;
+  vpRect.style.top = `${Math.max(0, vy)}px`;
+  vpRect.style.width = `${Math.min(mapW, vw)}px`;
+  vpRect.style.height = `${Math.min(mapH, vh)}px`;
+}
+
+// ==================== DETAIL DRAWER (SLIDE-IN) ====================
+function openDrawer(tableName) {
+  state.selectedTable = tableName;
+  const tbl = DB_MODEL.tables[tableName];
+  if (!tbl) return;
+
+  const drawer = document.getElementById('diagram-drawer');
+  document.getElementById('drawer-prefix').textContent = tbl.prefix;
+  document.getElementById('drawer-prefix').className = `prefix-tag prefix-${tbl.prefix}`;
+  document.getElementById('drawer-table-name').textContent = tbl.name;
+  document.getElementById('drawer-cols-count').textContent = tbl.columns_count;
+  document.getElementById('drawer-rows-count').textContent = formatNumber(tbl.rows);
+  document.getElementById('drawer-desc').textContent = tbl.description || 'Tabla de la base de datos db_test.';
+
+  // Columns list
+  const colsTbody = document.getElementById('drawer-cols-tbody');
+  colsTbody.innerHTML = '';
+  tbl.columns.forEach(c => {
+    const tr = document.createElement('tr');
+    let keyBadge = '-';
+    if (c.is_pk) keyBadge = '<span class="badge-tag badge-pk">PK</span>';
+    else if (c.is_fk) keyBadge = '<span class="badge-tag badge-fk">FK</span>';
+    else if (c.is_unique) keyBadge = '<span class="badge-tag badge-uq">UQ</span>';
+
+    tr.innerHTML = `
+      <td class="code-cell" style="font-weight: ${c.is_pk ? '600' : 'normal'}">${c.name}</td>
+      <td class="code-cell" style="color: var(--text-muted);">${c.type}</td>
+      <td>${keyBadge}</td>
+      <td>${c.nullable ? '<span class="badge-tag badge-null">NULL</span>' : '<span class="badge-tag badge-notnull">NOT NULL</span>'}</td>
+    `;
+    colsTbody.appendChild(tr);
+  });
+
+  // Outgoing FKs
+  const fksOutDiv = document.getElementById('drawer-fks-out');
+  fksOutDiv.innerHTML = '';
+  const outgoing = DB_MODEL.foreign_keys.filter(f => f.from_table === tableName);
+  document.getElementById('drawer-fks-out-count').textContent = outgoing.length;
+
+  if (outgoing.length === 0) {
+    fksOutDiv.innerHTML = '<span style="color: var(--text-muted); font-size: 0.74rem;">Sin llaves foráneas salientes.</span>';
+  } else {
+    outgoing.forEach(fk => {
+      const item = document.createElement('div');
+      item.innerHTML = `
+        <span class="code-cell" style="font-weight: 600;">${fk.from_cols.join(', ')}</span> &rarr; 
+        <a class="table-link" onclick="openDrawer('${fk.to_table}')">${fk.to_table}</a>.<span class="code-cell">${fk.to_cols.join(', ')}</span>
+      `;
+      fksOutDiv.appendChild(item);
+    });
+  }
+
+  // Incoming FKs
+  const fksInDiv = document.getElementById('drawer-fks-in');
+  fksInDiv.innerHTML = '';
+  const incoming = DB_MODEL.foreign_keys.filter(f => f.to_table === tableName);
+  document.getElementById('drawer-fks-in-count').textContent = incoming.length;
+
+  if (incoming.length === 0) {
+    fksInDiv.innerHTML = '<span style="color: var(--text-muted); font-size: 0.74rem;">Ninguna tabla la referencia.</span>';
+  } else {
+    incoming.forEach(fk => {
+      const item = document.createElement('div');
+      item.innerHTML = `
+        <a class="table-link" onclick="openDrawer('${fk.from_table}')">${fk.from_table}</a>.<span class="code-cell">${fk.from_cols.join(', ')}</span> &rarr; 
+        <span class="code-cell" style="font-weight: 600;">${fk.to_cols.join(', ')}</span>
+      `;
+      fksInDiv.appendChild(item);
+    });
+  }
+
+  // Associated triggers
+  const trgDiv = document.getElementById('drawer-triggers-list');
+  trgDiv.innerHTML = '';
+  const triggers = DB_MODEL.triggers.filter(t => t.table === tableName);
+  document.getElementById('drawer-triggers-count').textContent = triggers.length;
+
+  if (triggers.length === 0) {
+    trgDiv.innerHTML = '<span style="color: var(--text-muted); font-size: 0.74rem;">Sin triggers registrados (tabla no auditada directamente).</span>';
+  } else {
+    triggers.forEach(trg => {
+      const item = document.createElement('div');
+      item.innerHTML = `
+        <span class="badge-tag badge-event-${trg.event.toLowerCase()}">${trg.timing} ${trg.event}</span> 
+        <span class="code-cell">${trg.name}</span>
+      `;
+      trgDiv.appendChild(item);
+    });
+  }
+
+  // Associated views
+  const viewsDiv = document.getElementById('drawer-views-list');
+  viewsDiv.innerHTML = '';
+  const views = DB_MODEL.views.filter(v => v.base_table.includes(tableName));
+  document.getElementById('drawer-views-count').textContent = views.length;
+
+  if (views.length === 0) {
+    viewsDiv.innerHTML = '<span style="color: var(--text-muted); font-size: 0.74rem;">Sin vistas asociadas.</span>';
+  } else {
+    views.forEach(v => {
+      const item = document.createElement('div');
+      item.innerHTML = `<span class="code-cell" style="color: var(--accent-fk); font-weight: 500;">${v.name}</span>`;
+      viewsDiv.appendChild(item);
+    });
+  }
+
+  drawer.classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('diagram-drawer').classList.remove('open');
+}
+
+// ==================== TAB 3: DETALLE POR TABLA (MASTER TABLE & INSPECTOR) ====================
+function renderMasterTables() {
+  const tbody = document.getElementById('master-tables-tbody');
+  tbody.innerHTML = '';
+
+  const filterInput = document.getElementById('filter-all-tables');
+  const groupSelect = document.getElementById('select-group-filter');
+
+  function update() {
+    const q = filterInput.value.trim().toLowerCase();
+    const grp = groupSelect.value;
+
+    let tables = Object.values(DB_MODEL.tables);
+
+    if (grp !== 'all') {
+      tables = tables.filter(t => t.prefix === grp);
+    }
+    if (q) {
+      tables = tables.filter(t => t.name.toLowerCase().includes(q) || t.prefix.includes(q));
+    }
+
+    // Sort
+    tables.sort((a, b) => {
+      let vA, vB;
+      if (state.tableSortCol === 'name') {
+        vA = a.name; vB = b.name;
+        return state.tableSortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+      } else if (state.tableSortCol === 'group') {
+        vA = a.group; vB = b.group;
+        return state.tableSortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+      } else if (state.tableSortCol === 'cols') {
+        vA = a.columns_count; vB = b.columns_count;
+        return state.tableSortAsc ? vA - vB : vB - vA;
+      } else if (state.tableSortCol === 'rows') {
+        vA = a.rows; vB = b.rows;
+        return state.tableSortAsc ? vA - vB : vB - vA;
+      }
+      return 0;
+    });
+
+    document.getElementById('table-count-label').textContent = `${tables.length} de 27 tablas`;
+    tbody.innerHTML = '';
+
+    tables.forEach(t => {
+      const tr = document.createElement('tr');
+      const outgoing = DB_MODEL.foreign_keys.filter(f => f.from_table === t.name).length;
+      const incoming = DB_MODEL.foreign_keys.filter(f => f.to_table === t.name).length;
+      const triggers = DB_MODEL.triggers.filter(trg => trg.table === t.name).length;
+      const views = DB_MODEL.views.filter(v => v.base_table.includes(t.name)).length;
+
+      tr.innerHTML = `
+        <td>
+          <span class="prefix-tag prefix-${t.prefix}">${t.prefix}</span>
+          <span class="code-cell" style="font-weight: 600; margin-left: 0.35rem;">${t.name}</span>
+        </td>
+        <td style="color: var(--text-muted); font-size: 0.78rem;">${t.group}</td>
+        <td style="text-align: right; font-variant-numeric: tabular-nums;">${t.columns_count}</td>
+        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 600;">${formatNumber(t.rows)}</td>
+        <td style="text-align: center;">${outgoing > 0 ? `<span class="badge-tag badge-fk">${outgoing}</span>` : '<span style="color:#cbd5e1;">0</span>'}</td>
+        <td style="text-align: center;">${incoming > 0 ? `<span class="badge-tag badge-pk">${incoming}</span>` : '<span style="color:#cbd5e1;">0</span>'}</td>
+        <td style="text-align: center;">${triggers > 0 ? `<span class="badge-tag badge-notnull">${triggers}</span>` : '<span style="color:#cbd5e1;">0</span>'}</td>
+        <td style="text-align: center;">${views > 0 ? `<span class="badge-tag badge-null">${views}</span>` : '<span style="color:#cbd5e1;">0</span>'}</td>
+        <td style="text-align: center;">
+          <button class="tool-btn" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; margin: 0 auto;" onclick="inspectTable('${t.name}')">Ver Detalle</button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') {
+          inspectTable(t.name);
+        }
+      });
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  filterInput.addEventListener('input', update);
+  groupSelect.addEventListener('change', update);
+
+  document.querySelectorAll('#master-tables-grid th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      if (state.tableSortCol === col) {
+        state.tableSortAsc = !state.tableSortAsc;
+      } else {
+        state.tableSortCol = col;
+        state.tableSortAsc = true;
+      }
+      update();
+    });
+  });
+
+  update();
+}
+
+function inspectTable(tableName) {
+  state.selectedTable = tableName;
+  const tbl = DB_MODEL.tables[tableName];
+  if (!tbl) return;
+
+  document.getElementById('inspector-prefix').textContent = tbl.prefix;
+  document.getElementById('inspector-prefix').className = `prefix-tag prefix-${tbl.prefix}`;
+  document.getElementById('inspector-name').textContent = tbl.name;
+  document.getElementById('inspector-cols-pill').innerHTML = `<strong>${tbl.columns_count}</strong> columnas`;
+  document.getElementById('inspector-rows-pill').innerHTML = `<strong>${formatNumber(tbl.rows)}</strong> filas`;
+  document.getElementById('inspector-desc').textContent = tbl.description || 'Tabla de la base de datos db_test.';
+
+  // Populate Columns table
+  const tbody = document.getElementById('inspector-cols-tbody');
+  tbody.innerHTML = '';
+  tbl.columns.forEach((c, idx) => {
+    const tr = document.createElement('tr');
+    
+    let keyBadge = '-';
+    if (c.is_pk) keyBadge = '<span class="badge-tag badge-pk">PK (Llave Primaria)</span>';
+    else if (c.is_fk) {
+      const tgts = c.fk_refs.map(r => `${r.target_table}.${r.target_column}`).join(', ');
+      keyBadge = `<span class="badge-tag badge-fk" title="Destino: ${tgts}">FK &rarr; ${tgts}</span>`;
+    } else if (c.is_unique) {
+      keyBadge = '<span class="badge-tag badge-uq">UNIQUE</span>';
+    }
+
+    let extra = [];
+    if (c.auto_increment) extra.push('AUTO_INCREMENT');
+    if (c.type.includes('unsigned')) extra.push('UNSIGNED');
+
+    tr.innerHTML = `
+      <td style="color: var(--text-muted); font-size: 0.72rem;">${idx + 1}</td>
+      <td class="code-cell" style="font-weight: ${c.is_pk ? '700' : '500'};">${c.name}</td>
+      <td class="code-cell" style="color: var(--text-muted);">${c.type}</td>
+      <td>${keyBadge}</td>
+      <td>${c.nullable ? '<span class="badge-tag badge-null">NULL</span>' : '<span class="badge-tag badge-notnull">NOT NULL</span>'}</td>
+      <td class="code-cell" style="color: #64748b;">${c.default !== null ? c.default : '<em style="color:#94a3b8;">null</em>'}</td>
+      <td style="font-size: 0.72rem; color: var(--text-muted);">${extra.join(', ') || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Outgoing FKs
+  const fksOutDiv = document.getElementById('inspector-fks-out');
+  fksOutDiv.innerHTML = '';
+  const outgoing = DB_MODEL.foreign_keys.filter(f => f.from_table === tableName);
+  if (outgoing.length === 0) {
+    fksOutDiv.innerHTML = '<span style="font-size: 0.78rem; color: var(--text-muted);">Esta tabla no tiene llaves foráneas salientes.</span>';
+  } else {
+    outgoing.forEach(fk => {
+      const item = document.createElement('div');
+      item.style.padding = '0.5rem';
+      item.style.background = 'var(--bg-subtle)';
+      item.style.borderRadius = 'var(--radius-sm)';
+      item.style.fontSize = '0.78rem';
+      item.innerHTML = `
+        <div style="font-weight: 600;">
+          <span class="code-cell">${fk.from_cols.join(', ')}</span> &rarr; 
+          <a class="table-link" onclick="inspectTable('${fk.to_table}')">${fk.to_table}</a>.<span class="code-cell">${fk.to_cols.join(', ')}</span>
+        </div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">
+          Constraint: <code>${fk.constraint}</code> &bull; ON DELETE: ${fk.on_delete} &bull; ON UPDATE: ${fk.on_update}
+        </div>
+      `;
+      fksOutDiv.appendChild(item);
+    });
+  }
+
+  // Incoming FKs
+  const fksInDiv = document.getElementById('inspector-fks-in');
+  fksInDiv.innerHTML = '';
+  const incoming = DB_MODEL.foreign_keys.filter(f => f.to_table === tableName);
+  if (incoming.length === 0) {
+    fksInDiv.innerHTML = '<span style="font-size: 0.78rem; color: var(--text-muted);">Ninguna tabla referencia a esta tabla.</span>';
+  } else {
+    incoming.forEach(fk => {
+      const item = document.createElement('div');
+      item.style.padding = '0.5rem';
+      item.style.background = 'var(--bg-subtle)';
+      item.style.borderRadius = 'var(--radius-sm)';
+      item.style.fontSize = '0.78rem';
+      item.innerHTML = `
+        <div style="font-weight: 600;">
+          <a class="table-link" onclick="inspectTable('${fk.from_table}')">${fk.from_table}</a>.<span class="code-cell">${fk.from_cols.join(', ')}</span> &rarr; 
+          <span class="code-cell">${fk.to_cols.join(', ')}</span>
+        </div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">
+          Constraint: <code>${fk.constraint}</code>
+        </div>
+      `;
+      fksInDiv.appendChild(item);
+    });
+  }
+
+  // Triggers
+  const trgDiv = document.getElementById('inspector-triggers');
+  trgDiv.innerHTML = '';
+  const triggers = DB_MODEL.triggers.filter(t => t.table === tableName);
+  if (triggers.length === 0) {
+    trgDiv.innerHTML = '<span style="font-size: 0.78rem; color: var(--text-muted);">Sin triggers de auditoría configurados.</span>';
+  } else {
+    triggers.forEach(trg => {
+      const item = document.createElement('div');
+      item.style.padding = '0.45rem 0.6rem';
+      item.style.background = 'var(--bg-subtle)';
+      item.style.borderRadius = 'var(--radius-sm)';
+      item.style.fontSize = '0.78rem';
+      item.innerHTML = `
+        <span class="badge-tag badge-event-${trg.event.toLowerCase()}">${trg.timing} ${trg.event}</span>
+        <span class="code-cell" style="margin-left: 0.35rem;">${trg.name}</span>
+        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">Registra mutación en <code>tb_logs</code></div>
+      `;
+      trgDiv.appendChild(item);
+    });
+  }
+
+  // Views
+  const viewsDiv = document.getElementById('inspector-views');
+  viewsDiv.innerHTML = '';
+  const views = DB_MODEL.views.filter(v => v.base_table.includes(tableName));
+  if (views.length === 0) {
+    viewsDiv.innerHTML = '<span style="font-size: 0.78rem; color: var(--text-muted);">Sin vistas asociadas directamente.</span>';
+  } else {
+    views.forEach(v => {
+      const item = document.createElement('div');
+      item.style.padding = '0.45rem 0.6rem';
+      item.style.background = 'var(--bg-subtle)';
+      item.style.borderRadius = 'var(--radius-sm)';
+      item.style.fontSize = '0.78rem';
+      item.innerHTML = `
+        <div class="code-cell" style="color: var(--accent-fk); font-weight: 600;">${v.name}</div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">${v.description}</div>
+      `;
+      viewsDiv.appendChild(item);
+    });
+  }
+
+  const panel = document.getElementById('table-inspector-panel');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ==================== TAB 4: TRIGGERS ====================
+function renderTriggers() {
+  const tbody = document.getElementById('triggers-tbody');
+  const searchInput = document.getElementById('filter-triggers-search');
+  const tableSelect = document.getElementById('filter-triggers-table');
+  const eventPills = document.querySelectorAll('#pane-triggers .filter-pill');
+
+  let activeEvent = 'all';
+
+  const tablesWithTriggers = Array.from(new Set(DB_MODEL.triggers.map(t => t.table))).sort();
+  tablesWithTriggers.forEach(tbl => {
+    const opt = document.createElement('option');
+    opt.value = tbl;
+    opt.textContent = tbl;
+    tableSelect.appendChild(opt);
+  });
+
+  function update() {
+    const q = searchInput.value.trim().toLowerCase();
+    const tblFilter = tableSelect.value;
+
+    let trgs = DB_MODEL.triggers;
+
+    if (tblFilter !== 'all') {
+      trgs = trgs.filter(t => t.table === tblFilter);
+    }
+    if (activeEvent !== 'all') {
+      trgs = trgs.filter(t => t.event === activeEvent);
+    }
+    if (q) {
+      trgs = trgs.filter(t => t.name.toLowerCase().includes(q) || t.table.toLowerCase().includes(q));
+    }
+
+    document.getElementById('triggers-count-label').textContent = `${trgs.length} triggers`;
+    tbody.innerHTML = '';
+
+    trgs.forEach((trg, idx) => {
+      const tr = document.createElement('tr');
+      const opCode = trg.event === 'INSERT' ? 'Create' : trg.event === 'UPDATE' ? 'Update' : 'Delete';
+
+      tr.innerHTML = `
+        <td style="color: var(--text-muted); font-size: 0.74rem;">${idx + 1}</td>
+        <td class="code-cell" style="font-weight: 600;">${trg.name}</td>
+        <td><a class="table-link" onclick="inspectTable('${trg.table}'); switchTab('detalle');">${trg.table}</a></td>
+        <td><span class="badge-tag badge-notnull">${trg.timing}</span></td>
+        <td><span class="badge-tag badge-event-${trg.event.toLowerCase()}">${trg.event}</span></td>
+        <td><span class="code-cell">tb_logs</span></td>
+        <td><code>'${opCode}'</code></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  searchInput.addEventListener('input', update);
+  tableSelect.addEventListener('change', update);
+
+  eventPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      eventPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeEvent = pill.dataset.trgEvent;
+      update();
+    });
+  });
+
+  update();
+}
+
+// ==================== TAB 5: VISTAS ====================
+function renderViews() {
+  const tbody = document.getElementById('views-tbody');
+  const searchInput = document.getElementById('filter-views-search');
+  const filterPills = document.querySelectorAll('#pane-vistas .filter-pill');
+
+  let activeType = 'all';
+
+  function update() {
+    const q = searchInput.value.trim().toLowerCase();
+    let views = DB_MODEL.views;
+
+    if (activeType === 'trazabilidad') {
+      views = views.filter(v => v.name.startsWith('vw_trazabilidad_'));
+    } else if (activeType === 'catalogo') {
+      views = views.filter(v => !v.name.startsWith('vw_trazabilidad_'));
+    }
+
+    if (q) {
+      views = views.filter(v => v.name.toLowerCase().includes(q) || v.base_table.toLowerCase().includes(q));
+    }
+
+    document.getElementById('views-count-label').textContent = `${views.length} vistas`;
+    tbody.innerHTML = '';
+
+    views.forEach((v, idx) => {
+      const tr = document.createElement('tr');
+      const isTraza = v.name.startsWith('vw_trazabilidad_');
+
+      tr.innerHTML = `
+        <td style="color: var(--text-muted); font-size: 0.74rem;">${idx + 1}</td>
+        <td class="code-cell" style="color: var(--accent-fk); font-weight: 600;">${v.name}</td>
+        <td>
+          <a class="table-link" onclick="inspectTable('${v.base_table.split(',')[0].trim()}'); switchTab('detalle');">
+            ${v.base_table}
+          </a>
+        </td>
+        <td><span class="badge-tag ${isTraza ? 'badge-fk' : 'badge-pk'}">${isTraza ? 'Trazabilidad' : 'Catálogo CTE'}</span></td>
+        <td style="font-size: 0.78rem; color: var(--text-muted); max-width: 320px;">${v.description}</td>
+        <td style="font-size: 0.72rem; color: #475569;">
+          ${isTraza ? '<code>tb_logs b JOIN mysql.role_edges re</code>' : '<code>WITH RECURSIVE categoryhierarchy AS (...)</code>'}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  searchInput.addEventListener('input', update);
+  filterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      filterPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeType = pill.dataset.viewType;
+      update();
+    });
+  });
+
+  update();
+}
+
+// ==================== TAB 6: LLAVES FORÁNEAS ====================
+function renderForeignKeys() {
+  const tbody = document.getElementById('fks-tbody');
+  const searchInput = document.getElementById('filter-fks-search');
+  const tableSelect = document.getElementById('filter-fks-table');
+
+  const srcTables = Array.from(new Set(DB_MODEL.foreign_keys.map(f => f.from_table))).sort();
+  srcTables.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    tableSelect.appendChild(opt);
+  });
+
+  function update() {
+    const q = searchInput.value.trim().toLowerCase();
+    const selTable = tableSelect.value;
+
+    let fks = DB_MODEL.foreign_keys;
+
+    if (selTable !== 'all') {
+      fks = fks.filter(f => f.from_table === selTable);
+    }
+    if (q) {
+      fks = fks.filter(f => 
+        f.from_table.toLowerCase().includes(q) || 
+        f.to_table.toLowerCase().includes(q) || 
+        f.from_cols.some(c => c.toLowerCase().includes(q)) || 
+        f.to_cols.some(c => c.toLowerCase().includes(q))
+      );
+    }
+
+    document.getElementById('fks-count-label').textContent = `${fks.length} relaciones`;
+    tbody.innerHTML = '';
+
+    fks.forEach((fk, idx) => {
+      const tr = document.createElement('tr');
+      const isSelf = fk.from_table === fk.to_table;
+      const isComposite = fk.from_cols.length > 1;
+
+      let typeBadge = '<span class="badge-tag badge-null">1:N Simple</span>';
+      if (isSelf) typeBadge = '<span class="badge-tag badge-pk">Auto-referencial</span>';
+      else if (isComposite) typeBadge = '<span class="badge-tag badge-uq">Compuesta (2 cols)</span>';
+
+      tr.innerHTML = `
+        <td style="color: var(--text-muted); font-size: 0.74rem;">${idx + 1}</td>
+        <td><a class="table-link" onclick="inspectTable('${fk.from_table}'); switchTab('detalle');">${fk.from_table}</a></td>
+        <td class="code-cell" style="font-weight: 600;">${fk.from_cols.join(', ')}</td>
+        <td style="text-align: center; color: var(--accent-fk); font-weight: bold;">&rarr;</td>
+        <td><a class="table-link" onclick="inspectTable('${fk.to_table}'); switchTab('detalle');">${fk.to_table}</a></td>
+        <td class="code-cell" style="font-weight: 600;">${fk.to_cols.join(', ')}</td>
+        <td class="code-cell" style="color: var(--text-muted); font-size: 0.72rem;">${fk.constraint}</td>
+        <td style="font-size: 0.72rem;">${fk.on_delete}</td>
+        <td style="font-size: 0.72rem;">${fk.on_update}</td>
+        <td>${typeBadge}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  searchInput.addEventListener('input', update);
+  tableSelect.addEventListener('change', update);
+
+  update();
+}
+</script>
+</body>
+</html>
