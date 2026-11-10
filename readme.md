@@ -1,12 +1,13 @@
 # Practica de la Asignatura Optativa I: Bases de Datos en la Nube
 ## Ing. en Tecnologias de la informacion e Innovacion Digital
 ## Docente: M.T.I. Marco A. Ramirez Hernández
-Periiodo: Septiembre - Diciembre 2026
+Periodo: Septiembre - Diciembre 2026
 
 ---
 
-|ID |Numero de Practicas |Nombre de la Practica |Ponteciador |Estatus|
+|ID |Nombre de la Practica | Descripcion |Ponteciador |Estatus|
 |---|---|---|---|---|
-|1.| Practica 02 |Conexion Remota en Mysql |42 |🟢 Concluida|
-|2.| Conexiones Remotas para Bases de Datos SQL |Crear y administrar usaurios y privilegios para conexiones desde internet o redes locales |60 |🟢 Concluida|
-|2.| Conexiones Remotas para Bases de Datos SQL|SN |🟢 Concluida|
+|1.|Metodologia de La evaluacion | Transcribir en libreta y comprender la metodologia y fechas de evaluacion de la asignatura |5 |🟢 Concluida|
+|2.|Conexion Remotas en Mysql| Crear y Administrar usuarios y privilegios |42 |🟢 Concluida|
+|3.|Manipulacion de Datos en Conexiones Remotas a Bases de Datos Relacionales| Crear Procesamiento Almacenados Funciones, Tanlas Derivadas, importacion de Datos en el E-Commerce |100 |🟢 Concluida|
+|4.| Examen Practico Instalacion de Postgre y Mysql en un VPS|Instalar, Configurar, Desplegar y Simular datos en los servicios de Bases de Datos Relacionales Remotas|100 |🟢 Concluida|
