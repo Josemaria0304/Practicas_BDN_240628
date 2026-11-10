@@ -85,5 +85,9 @@ Conteos ejecutados sobre el respaldo (tablas, triggers, vistas, rutinas, usuario
 ## 10 y 11. Documentación técnica y GitHub
 
 - Modelo Entidad-Relación Extendido y Diccionario de Datos con **Archify**: _por agregar_.
-- Rama **`Practica03`** fusionada con la rama principal: _por agregar_.
+- Rama **`Practica03`** fusionada con la rama principal: Agregada.
+
+Link: [Ver Diccionario de Datos Interactivo](https://josemaria0304.github.io/Practicas_BDN_240628/Practica03/diccionario_datos_interactivo.html)
+
+Link: [Ver Diagrama Entidad-Relacion](https://josemaria0304.github.io/Practicas_BDN_240628/Practica03/diagrama_er_db_test.html)
 
