@@ -11,12 +11,19 @@ Practica04/
 │   ├── Respaldo-20261102(2).sql
 │   ├── Respaldo-20261111.sql
 │   ├── Respaldo-20261112.sql
-│   └── Respaldo-20261118.sql              # Respaldo más reciente
+│   ├── Respaldo-20261118.sql
+│   ├── Respaldo-20261119.sql
+│   └── Respaldo-20261119 (2).sql          # Respaldo más reciente
+├── Evidencia/                             # Capturas de las vistas de trazabilidad por caso
+│   ├── Caso1.png
+│   ├── Caso2.png
+│   ├── Caso3.png
+│   ├── Caso4.png
+│   └── Caso5.png
 ├── queries/
 │   └── consulta_de_verificacion.sql
 ├── scripts/
-│   ├── remote_users_privileges_creation.sql
-│   └── triggers_tbd_carts_items.sql       # Triggers de auditoría de tbd_carts_items
+│   └── remote_users_privileges_creation.sql
 ├── seeds/
 │   └── productos_5000.csv
 ├── diagrama_er_db_test.html               # Diagrama Entidad-Relación interactivo
@@ -24,7 +31,7 @@ Practica04/
 └── README.md
 ```
 
-Los dos HTML tienen un botón en la parte superior para pasar de uno al otro.
+Los dos HTML tienen un botón en la parte superior para pasar de uno al otro. Ambos están actualizados con el respaldo `Respaldo-20261119 (2).sql`: 25 tablas, 211 columnas, 36 llaves foráneas, 72 triggers y 32 vistas (24 de trazabilidad por tabla, 7 de los casos de prueba y 1 de catálogo).
 
 ---
 
@@ -100,3 +107,45 @@ Los dos HTML tienen un botón en la parte superior para pasar de uno al otro.
 | 3 | Cancelación parcial y reembolso | 3 de la misma categoría | Tarjeta digital (Spin) | 1 en efectivo | "Casa Papas" | Exitosa con reembolso parcial |
 | 4 | Mismo proveedor | 3 del mismo proveedor | Transferencia SPEI | 1 en efectivo | Punto de recolección | Exitosa |
 | 5 | Falta de inventario | 1 | Cupón de regalo | — | Domicilio | Fallida, cupón reasignado |
+
+---
+
+## Evidencias
+
+Las capturas de la carpeta `Evidencia/` muestran, en MySQL Workbench sobre `db_test`, el resultado de las vistas de trazabilidad de cada caso de prueba. Cada vista numera los eventos registrados en `tb_logs` (columna `paso`) y muestra la fase, el rol, el usuario ejecutor, la conexión, la fecha, la tabla modificada, la operación y el detalle del evento.
+
+Consulta utilizada:
+
+```sql
+SELECT * FROM vista_trazabilidad_caso_1 ORDER BY paso;
+SELECT * FROM vista_trazabilidad_caso_2 ORDER BY paso;
+SELECT * FROM vista_trazabilidad_caso_3 ORDER BY paso;
+SELECT * FROM vista_trazabilidad_caso_4 ORDER BY paso;
+SELECT * FROM vista_trazabilidad_caso_5 ORDER BY paso;
+```
+
+### Caso de Prueba 1 — Compra exitosa, sin modificaciones
+
+![Evidencia Caso 1](Evidencia/Caso1.png)
+
+### Caso de Prueba 2 — Compra a 6 pagos con rechazo, reclamación y reenvío
+
+![Evidencia Caso 2](Evidencia/Caso2.png)
+
+### Caso de Prueba 3 — Compra con cancelación parcial, ajuste y reembolso
+
+![Evidencia Caso 3](Evidencia/Caso3.png)
+
+### Caso de Prueba 4 — Compra del mismo proveedor, entrega en punto de recolección
+
+![Evidencia Caso 4](Evidencia/Caso4.png)
+
+### Caso de Prueba 5 — Compra fallida por falta de inventario
+
+![Evidencia Caso 5](Evidencia/Caso5.png)
+
+El resumen de eventos por caso y fase se puede consultar con:
+
+```sql
+SELECT * FROM vista_trazabilidad_resumen_casos;
+```
