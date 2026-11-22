@@ -1,6 +1,9 @@
 # Practica de la Asignatura Optativa I: Bases de Datos en la Nube
 ## Ing. en Tecnologias de la informacion e Innovacion Digital
 ## Docente: M.T.I. Marco A. Ramirez Hernández
+
+a
+
 Periodo: Septiembre - Diciembre 2026
 
 ---
