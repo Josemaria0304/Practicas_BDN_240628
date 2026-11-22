@@ -1,0 +1,2 @@
+{"_id":{"$oid":"6b020c96cc7fcd0b2fffb4c5"},"order_id":2,"user_id":8559,"carrier":"DHL","tracking_number":"DHL4455667788","status":"en_reparto","estimated_delivery":{"$date":"2026-11-16T23:59:00Z"},"dias_retraso":5}
+{"_id":{"$oid":"6b020c96cc7fcd0b2fffb4c6"},"order_id":2,"user_id":8559,"carrier":"Paquetexpress","tracking_number":"PQX20261112002","status":"en_transito","estimated_delivery":{"$date":"2026-11-18T23:59:00Z"},"dias_retraso":3}
