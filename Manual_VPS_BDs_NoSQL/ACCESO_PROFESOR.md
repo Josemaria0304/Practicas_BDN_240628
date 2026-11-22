@@ -14,9 +14,9 @@ Con el rol admin puede leer y modificar todos los datos y crear índices, pero n
 | Servicio | Dirección | Usuario | Contraseña |
 | --- | --- | --- | --- |
 | PostgreSQL (`db_test_u2`) | `srv2060502.hstgr.cloud:40631` | `marco.ramirez` | `qwerty123` |
-| pgAdmin Web (login de la página) | http://srv2060502.hstgr.cloud:40632 | `marco.ramirez@utxicotepec.edu.mx` | `______________` |
+| pgAdmin Web (login de la página) | http://srv2060502.hstgr.cloud:40632 | `marco.ramirez@utxicotepec.edu.mx` | `qwerty123` |
 | MongoDB (`db_ecommerce_nosql`) | `srv2060502.hstgr.cloud:40633` | `marco.ramirez` | `qwerty123` |
-| Mongo Express | http://srv2060502.hstgr.cloud:40634 | `______________` | `______________` |
+| Mongo Express | http://srv2060502.hstgr.cloud:40634 | `Admin` | `12345` |
 | API GraphQL | http://srv2060502.hstgr.cloud:40635 | `marco.ramirez` (encabezado) | `qwerty123` (encabezado) |
 | MySQL (`db_test`) | `srv2060502.hstgr.cloud:40629` | `marco.ramirez` | `qwerty123` |
 

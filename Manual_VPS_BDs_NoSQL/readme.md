@@ -5,7 +5,7 @@ Alumno: José Castillo · Matrícula 240628 · VPS `srv2060502.hstgr.cloud` (Hos
 
 Un solo proyecto Docker Compose (`nosql_240628`) con 5 servicios: PostgreSQL y pgAdmin (conservados de la Unidad 1), MongoDB 8, Mongo Express y una API GraphQL propia. La base relacional del e-commerce (`db_test`) está en MySQL y migrada a PostgreSQL (`db_test_u2`). MongoDB (`db_ecommerce_nosql`) guarda direcciones, reseñas, seguimiento de envíos y la bitácora, enlazados por ID con PostgreSQL.
 
-> Las credenciales de acceso para evaluación están en `ACCESO_PROFESOR.md`, que se entrega aparte y **no** se sube al repositorio.
+> Las credenciales de acceso para evaluación están en [`ACCESO_PROFESOR.md`](ACCESO_PROFESOR.md), que se entrega aparte y **no** se sube al repositorio.
 
 ---
 
