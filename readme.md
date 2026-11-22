@@ -2,7 +2,7 @@
 ## Ing. en Tecnologias de la informacion e Innovacion Digital
 ## Docente: M.T.I. Marco A. Ramirez Hernández
 
-a
+a2
 
 Periodo: Septiembre - Diciembre 2026
 
