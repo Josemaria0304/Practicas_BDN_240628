@@ -1,0 +1,11 @@
+{
+  "name": "graphql-ecommerce-nosql",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "graphql": "^16.9.0",
+    "mongoose": "^8.8.0"
+  }
+}

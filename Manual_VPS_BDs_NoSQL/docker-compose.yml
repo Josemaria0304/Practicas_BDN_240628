@@ -1,0 +1,108 @@
+name: nosql_${MATRICULA}
+
+services:
+  postgres:                         # Unidad 1 (se conserva)
+    image: postgres:18
+    container_name: pg_${MATRICULA}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PG_ADMIN_USER}
+      POSTGRES_PASSWORD: ${PG_ADMIN_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_ADMIN_USER} -d ${PG_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [backend]
+
+  pgadmin:                          # Unidad 1 (se conserva)
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_${MATRICULA}
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "${PGADMIN_PORT}:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [backend]
+
+  mongodb:                          # Unidad 2
+    image: mongo:8.0
+    container_name: u2_mongo_${MATRICULA}
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+      MONGO_DB: ${MONGO_DB}
+      MONGO_APP_USER: ${MONGO_APP_USER}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD}
+      TEST_USERS_PASSWORD: ${TEST_USERS_PASSWORD}
+    command: ["mongod", "--auth", "--bind_ip_all"]
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongodb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks: [backend]
+
+  mongo-express:                    # Unidad 2
+    image: mongo-express:1.0.2
+    container_name: u2_mongoexpress_${MATRICULA}
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH: "true"
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_PASSWORD}
+    ports:
+      - "${ME_PORT}:8081"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks: [backend]
+
+  graphql:                          # Unidad 2
+    build: ./graphql
+    container_name: u2_graphql_${MATRICULA}
+    restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongodb:27017/${MONGO_DB}?authSource=${MONGO_DB}
+      MONGO_DB: ${MONGO_DB}
+      PORT: 4000
+    ports:
+      - "${GRAPHQL_PORT}:4000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks: [backend]
+
+networks:
+  backend:
+    name: nosql_${MATRICULA}_net
+
+volumes:
+  pg_data:
+    external: true
+    name: bdnube_${MATRICULA}_pg_data
+  pgadmin_data:
+    external: true
+    name: bdnube_${MATRICULA}_pgadmin_data
+  mongo_data:
+    name: nosql_${MATRICULA}_mongo_data
